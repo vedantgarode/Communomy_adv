@@ -43,7 +43,7 @@ const Signup = () => {
               onChange={(e) => setUserName(e.target.value)}
             />
           </Form.Group>
-          <Form.Group  controlId="formBasicEmail">
+          <Form.Group >
             <Form.Control
               type="email"
               placeholder="Email address"
@@ -51,7 +51,7 @@ const Signup = () => {
             />
           </Form.Group>
 
-          <Form.Group controlId="formBasicPassword">
+          <Form.Group>
             <Form.Control
               type="password"
               placeholder="Password"

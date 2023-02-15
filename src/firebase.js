@@ -21,11 +21,12 @@ export const db = getFirestore(app);
 
 
 export const findUser = async (BID) => {
-  const docRef = doc(db ,"/users" ,BID );
+  const docRef = doc(db ,"/users_search" ,BID );
   const docSnap = await getDoc(docRef);
 
   if (docSnap.exists() ) {
     console.log("User data:", docSnap.data());
+    return docSnap;
   } else {
     console.log("No such document!");
   }

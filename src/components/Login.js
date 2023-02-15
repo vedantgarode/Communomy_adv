@@ -27,7 +27,7 @@ const Login = () => {
         <h2 >Firebase Auth Login</h2>
         {error && <Alert variant="danger">{error}</Alert>}
         <Form onSubmit={handleSubmit}>
-          <Form.Group controlId="formBasicEmail">
+          <Form.Group >
             <Form.Control
               type="email"
               placeholder="Email address"
@@ -35,7 +35,7 @@ const Login = () => {
             />
           </Form.Group>
 
-          <Form.Group controlId="formBasicPassword">
+          <Form.Group >
             <Form.Control
               type="password"
               placeholder="Password"
