@@ -1,7 +1,7 @@
 import React , { useState }from "react";
 import { findUser } from "../firebase";
 import { useNavigate } from "react-router";
-import { Form, Alert } from "react-bootstrap";
+import { Form} from "react-bootstrap";
 import { useUserAuth } from "../context/UserAuthContext";
 
 const Home = () => {

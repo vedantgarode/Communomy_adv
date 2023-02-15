@@ -24,7 +24,7 @@ const Signup = () => {
       })
       createUserDocument(user);
       register_User(user);
-      navigate("/");
+      navigate("/home");
     } catch (err) {
       setError(err.message);
     }

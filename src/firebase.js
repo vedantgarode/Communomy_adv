@@ -38,7 +38,7 @@ export const register_User = async (user) => {
   try {
     await setDoc(doc(userRef,user.displayName),{
       BID : user.uid,
-      metamask : "dfbsdjhsdsdhbdhbshDB"
+      metamask : "to be added"
     });
   } catch (error) {
     console.log('Error in creating user', error);
@@ -58,7 +58,7 @@ export const createUserDocument = async (user) => {
       user_Name :user.displayName,
       email :user.email,
       createdAt: new Date(),
-      metamask : "dfbsdjhsdsdhbdhbshDB"
+      metamask : "to be added"
     });
   } catch (error) {
     console.log('Error in creating user', error);
