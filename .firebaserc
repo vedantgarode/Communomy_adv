@@ -1,5 +1,8 @@
 {
   "projects": {
-    "default": "communomy-main"
-  }
+    "communomyadv": "communomyadv",
+    "default": "communomyadv"
+  },
+  "targets": {},
+  "etags": {}
 }
