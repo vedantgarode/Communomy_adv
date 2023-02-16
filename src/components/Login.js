@@ -10,7 +10,10 @@ const Login = () => {
   const [error, setError] = useState("");
   const { logIn } = useUserAuth();
   const navigate = useNavigate();
-
+  const { user } = useUserAuth();
+  if(user){
+    navigate("/home");
+  }
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
