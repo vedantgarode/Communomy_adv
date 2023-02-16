@@ -1,12 +1,13 @@
 import React , { useState }from "react";
-import { findUser } from "../firebase";
+import { findUser , transact} from "../firebase";
 import { useNavigate } from "react-router";
 import { Form} from "react-bootstrap";
 import { useUserAuth } from "../context/UserAuthContext";
 
 const Home = () => {
   const { logOut, user } = useUserAuth();
-  const [bid, setbid] = useState("");
+  const [Terror, setTError] = useState("");
+  const [userSearch, setUserSearch] = useState("");
   const [user_search_metamask , setUserSearchMetamask] = useState("");
   const [user_search_bid , setUserSearchBID] = useState("");
   const navigate = useNavigate();
@@ -18,16 +19,35 @@ const Home = () => {
       console.log(error.message);
     }
   };
-  const find = async (e) => {
-    e.preventDefault()
+
+  const transaction = async (e) =>{
+    e.preventDefault();
     try {
-      const  user2  =await findUser(bid);
-      setUserSearchBID(user2.data().BID);
-      setUserSearchMetamask(user2.data().metamask);
+      const  user2  =await findUser(userSearch.trim().toLowerCase());
+      const IError = await transact(user , user2.data());
+
+      setTError(IError);
+      console.log(Terror);
     } catch (error) {
       console.log("No user Found !");
     }
   };
+
+
+
+  const find = async (e) => {
+    e.preventDefault();
+    try {
+      const  user2  =await findUser(userSearch.trim().toLowerCase());
+      setUserSearchBID(user2.data().BID);
+      setUserSearchMetamask(user2.data().metamask);
+    } catch (error) {
+      setUserSearchBID("No User Found !");
+      setUserSearchMetamask("No User Found !");
+      console.log("No user Found !");
+    }
+  };
+ 
   return (
     <>
       <div>
@@ -47,15 +67,20 @@ const Home = () => {
             <Form.Control
               type="text"
               placeholder="User Name to search"
-              onChange={(e) => setbid(e.target.value)}
+              onChange={(e) => setUserSearch(e.target.value)}
             />
           </Form.Group>
         </Form>
-        <button onClick={find}>
-          Find
-        </button>
         <div>
-        Result - <br />
+        <button onClick={find}>
+          Search
+        </button>
+        <button onClick={transaction}>
+          Make Transaction
+        </button><br />
+        { Terror }
+      </div>
+      <div>
         User BID : {user_search_bid}<br />
         User metamask: {user_search_metamask}
       </div>

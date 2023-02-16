@@ -19,13 +19,26 @@ export const auth = getAuth();
 
 export const db = getFirestore(app);
 
+export const transact = async(user1, user2) =>{
+  const user2Ref = collection(db ,"/pending_transact");
+  // console.log(user1);
+  // console.log(user2);
+  await setDoc(doc(user2Ref),{
+  Sender_BID : user1.uid,
+  Sender_metamask : "to be added",
+  Receiver_BID : user2.BID,
+  Reciver_metamask : user2.metamask,
+  Value : "10 cr",
+  })
+  return "Transaction Added Successfully"
+}
 
 export const findUser = async (BID) => {
   const docRef = doc(db ,"/users_search" ,BID );
   const docSnap = await getDoc(docRef);
-
+  
   if (docSnap.exists() ) {
-    console.log("User data:", docSnap.data());
+    //console.log("User data:", docSnap.data());
     return docSnap;
   } else {
     console.log("No such document!");
