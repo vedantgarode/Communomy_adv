@@ -1,12 +1,15 @@
 import React , { useState }from "react";
-import { findUser , transact} from "../firebase";
+import { findUser , transact , add_familiy , search_familiy} from "../firebase";
 import { useNavigate } from "react-router";
 import { Form} from "react-bootstrap";
 import { useUserAuth } from "../context/UserAuthContext";
 
+
 const Home = () => {
   const { logOut, user } = useUserAuth();
   const [Terror, setTError] = useState("");
+  const [my_friends, SearchFriend] = useState([]);
+  const [frnd_added, setFriend] = useState("");
   const [userSearch, setUserSearch] = useState("");
   const [user_search_metamask , setUserSearchMetamask] = useState("");
   const [user_search_bid , setUserSearchBID] = useState("");
@@ -19,17 +22,39 @@ const Home = () => {
       console.log(error.message);
     }
   };
+  const Search_familiy = async(e) =>{
+    e.preventDefault();
+    try {
+      document.getElementById("my_friends").innerHTML = "";  
+      SearchFriend(await search_familiy(user)); 
+      await my_friends.forEach((element) =>{
+        document.getElementById("my_friends").innerHTML += element +"</br>";   
+      }); 
+      console.log(my_friends);   
+       
+    } catch (error) {
+      console.log("Friend Searching Failed !");
+    }
+    
+  }
+  const Add_familiy =async(e) =>{
+    e.preventDefault();
+    try {
+      const  user2  =await findUser(userSearch.trim().toLowerCase());
+      setFriend(await add_familiy(user , user2.data(), userSearch));      
+    } catch (error) {
+      console.log("Friend addition Failed !");
+    }
+  }
+
 
   const transaction = async (e) =>{
     e.preventDefault();
     try {
       const  user2  =await findUser(userSearch.trim().toLowerCase());
-      const IError = await transact(user , user2.data());
-
-      setTError(IError);
-      console.log(Terror);
+      setTError(await transact(user , user2.data())); 
     } catch (error) {
-      console.log("No user Found !");
+      console.log("Transaction Failed !");
     }
   };
 
@@ -75,15 +100,26 @@ const Home = () => {
         <button onClick={find}>
           Search
         </button>
+        <div>
+        User BID : {user_search_bid}<br />
+        User metamask: {user_search_metamask}
+        </div>
         <button onClick={transaction}>
           Make Transaction
         </button><br />
-        { Terror }
+        { Terror }<br />
+        <button onClick={Add_familiy}>
+          Add Friend
+        </button><br />
+        { frnd_added }<br />
+        <button onClick={ Search_familiy }>
+          My Friends
+        </button><br />
+
+        <div id="my_friends"></div>
+     
       </div>
-      <div>
-        User BID : {user_search_bid}<br />
-        User metamask: {user_search_metamask}
-      </div>
+      
       </div>
     </>
   );

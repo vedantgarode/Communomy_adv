@@ -1,7 +1,7 @@
 
 import { initializeApp } from "firebase/app";
 import { getAuth  } from 'firebase/auth'
-import {collection, getFirestore ,doc, setDoc  ,getDoc} from "firebase/firestore";
+import {collection, getFirestore ,doc, setDoc  ,getDoc ,getDocs} from "firebase/firestore";
 
 const firebaseConfig = {
   apiKey: "AIzaSyDz2MWbf5xqGdvjbVLgJD0vHK4l7qq18IM",
@@ -18,6 +18,40 @@ export const app = initializeApp(firebaseConfig);
 export const auth = getAuth();
 
 export const db = getFirestore(app);
+
+
+export const search_familiy = async(user) =>{
+  const family =[];
+  try{
+  const querySnapshot = await getDocs(collection(db, "/users_search/"+user.displayName+"/my_family"));
+  console.log(querySnapshot);
+  querySnapshot.forEach((doc) => {
+  family.push(doc.data().Name);
+});
+  }catch(e){
+    console.log(e);
+  }
+  return family;
+}
+
+
+export const add_familiy = async(user1, user2 ,u2Name) =>{
+  const DocRef = collection(db ,"/users_search/"+user1.displayName+"/my_family");
+  const FrndRef = doc(db, "/users_search/"+user1.displayName+"/my_family", u2Name);
+  const docSnap = await getDoc(FrndRef);
+  //console.log(docSnap.data());
+  if (docSnap.exists() ) {
+    return "User Already Friend !";
+  } 
+  else {
+    await setDoc(doc(DocRef ,u2Name),{
+      Name : u2Name,
+      BID :user2.BID,
+      })
+      return "User Added !";
+  }
+}
+
 
 export const transact = async(user1, user2) =>{
   const user2Ref = collection(db ,"/pending_transact");
