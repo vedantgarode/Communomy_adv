@@ -3,6 +3,7 @@ import { initializeApp } from "firebase/app";
 import { getAuth  } from 'firebase/auth'
 import {collection, getFirestore ,doc, setDoc  ,getDoc ,getDocs} from "firebase/firestore";
 
+
 const firebaseConfig = {
   apiKey: "AIzaSyDz2MWbf5xqGdvjbVLgJD0vHK4l7qq18IM",
   authDomain: "communomyadv.firebaseapp.com",
@@ -14,10 +15,36 @@ const firebaseConfig = {
 };
 
 
+
 export const app = initializeApp(firebaseConfig);
 export const auth = getAuth();
 
 export const db = getFirestore(app);
+
+
+
+async function getAccount() {
+  const accounts = await window.ethereum.request({
+    method: "eth_requestAccounts",
+  });
+  const account = accounts[0];
+  return account;
+}
+
+export const  handleMetaMask = async () => {
+  //console.log("heheheh)))))", window.ethereum);
+  
+  if (typeof window !== "undefined") {
+    getAccount().then((res) => {
+      // setAcc_add(res);
+      // getBalnce(res);
+      const account = res;
+      return account;
+    });
+  }
+};
+
+
 
 
 export const search_familiy = async(user) =>{
@@ -53,22 +80,24 @@ export const add_familiy = async(user1, user2 ,u2Name) =>{
 }
 
 
-export const transact = async(user1, user2) =>{
+export const transact = async(user1, user2 ,amount , coin) =>{
   const user2Ref = collection(db ,"/pending_transact");
-  // console.log(user1);
-  // console.log(user2);
+  //console.log("Sender :" ,user2);
+  //console.log(user2);
   await setDoc(doc(user2Ref),{
-  Sender_BID : user1.uid,
-  Sender_metamask : "to be added",
+  Transaction_Time : new Date(),
+  Sender_BID : user1.BID,
+  Sender_metamask : user1.metamask,
   Receiver_BID : user2.BID,
   Reciver_metamask : user2.metamask,
-  Value : "10 cr",
+  Coin_Type : coin,
+  Value : parseInt(amount),
   })
   return "Transaction Added Successfully"
 }
 
-export const findUser = async (BID) => {
-  const docRef = doc(db ,"/users_search" ,BID );
+export const findUser = async (user_name) => {
+  const docRef = doc(db ,"/users_search" ,user_name );
   const docSnap = await getDoc(docRef);
   
   if (docSnap.exists() ) {
@@ -76,16 +105,21 @@ export const findUser = async (BID) => {
     return docSnap;
   } else {
     console.log("No such document!");
+    return false;
   }
 }
 
-export const register_User = async (user) => {
+export const register_User = async (user, metaAdd) => {
   if (!user) alert("No User Found !");
   const userRef = collection(db ,"/users_search" );
   try {
     await setDoc(doc(userRef,user.displayName),{
       BID : user.uid,
-      metamask : "to be added"
+      metamask : metaAdd,
+      user_name :user.displayName,
+      email : user.email,
+      invested_amount : 0,
+      createdAt: new Date(),
     });
   } catch (error) {
     console.log('Error in creating user', error);
@@ -95,7 +129,7 @@ export const register_User = async (user) => {
 
 
 
-export const createUserDocument = async (user) => {
+export const createUserDocument = async (user ,metaAdd) => {
   if (!user) alert("No User Found !");
   
   const userRef = collection(db ,"/users" );
@@ -105,7 +139,8 @@ export const createUserDocument = async (user) => {
       user_Name :user.displayName,
       email :user.email,
       createdAt: new Date(),
-      metamask : "to be added"
+      metamask : metaAdd,
+      invested_amount : 0
     });
   } catch (error) {
     console.log('Error in creating user', error);

@@ -3,9 +3,10 @@ import { Routes, Route } from "react-router-dom";
 
 import Home from "./components/Home.js";
 import Login from "./components/Login.js";
-import Signup from "./components/Signup.js";
+
 import ProtectedRoute from "./components/ProtectedRoute.js";
 import { UserAuthContextProvider } from "./context/UserAuthContext";
+import { Wallet } from "./components/Metamask.js";
 
 function App() {
   return (
@@ -23,7 +24,7 @@ function App() {
                 }
               />
               <Route path="/" element={<Login />} />
-              <Route path="/signup" element={<Signup />} />
+              <Route path="/signup" element={<Wallet />} />
             </Routes>
           </UserAuthContextProvider>
         </Col>
