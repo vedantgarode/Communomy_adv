@@ -58,6 +58,7 @@ export const search_familiy = async(user) =>{
   }catch(e){
     console.log(e);
   }
+  console.log(family);
   return family;
 }
 

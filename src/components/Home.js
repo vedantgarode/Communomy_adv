@@ -16,6 +16,9 @@ const Home = () => {
   const [user_search_metamask , setUserSearchMetamask] = useState("");
   const [user_search_bid , setUserSearchBID] = useState("");
   const navigate = useNavigate();
+
+
+console.log("some",my_friends?.map((row)=>row))
   const handleLogout = async () => {
     try {
       await logOut();
@@ -27,12 +30,9 @@ const Home = () => {
   const Search_familiy = async(e) =>{
     e.preventDefault();
     try {
-      document.getElementById("my_friends").innerHTML = "";  
+      
       SearchFriend(await search_familiy(user)); 
-      await my_friends.forEach((element) =>{
-        document.getElementById("my_friends").innerHTML += element +"</br>";   
-      }); 
-      console.log(my_friends);   
+      
        
     } catch (error) {
       console.log("Friend Searching Failed !");
@@ -135,8 +135,9 @@ const Home = () => {
         </button><br />
         { frnd_added }<br />
         <button onClick={ Search_familiy }>
-          My Friends
+          View My Community members
         </button><br />
+        {my_friends.map((row)=><h4>{row}</h4>)}
         
         <div id="my_friends"></div>
      

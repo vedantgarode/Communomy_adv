@@ -51,7 +51,7 @@ const Signup = (props) => {
   return (
     <>
       <div>
-        <h2 >Firebase Auth Signup</h2>
+        <h2 >Communomy Signup</h2>
         {error && <Alert variant="danger">{error}</Alert>}
         <Form onSubmit={handleSubmit}>
           <Form.Group>
