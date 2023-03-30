@@ -5,6 +5,7 @@ import { Form} from "react-bootstrap";
 import { useUserAuth } from "../context/UserAuthContext";
 
 
+
 const Home = () => {
   const { logOut, user } = useUserAuth();
   const [Terror, setTError] = useState("");
@@ -12,13 +13,24 @@ const Home = () => {
   const [frnd_added, setFriend] = useState("");
   const [userSearch, setUserSearch] = useState("");
   const [userAmount, setAmount] = useState(0);
+  const [logedUser, setlogedUser] = useState();
   const [userCoin, setCoin] = useState("Etherium");
   const [user_search_metamask , setUserSearchMetamask] = useState("");
   const [user_search_bid , setUserSearchBID] = useState("");
   const navigate = useNavigate();
 
-
-console.log("some",my_friends?.map((row)=>row))
+  const my_info = async (e) => {
+    e.preventDefault();
+    try {
+      setlogedUser((await findUser(user.displayName)).data());
+      //console.log(logedUser); 
+    } catch (error) {
+      setUserSearchBID("No User Found !");
+      setUserSearchMetamask("No User Found !");
+      console.log("No user Found !");
+    }
+  };
+  
   const handleLogout = async () => {
     try {
       await logOut();
@@ -57,8 +69,7 @@ console.log("some",my_friends?.map((row)=>row))
       const  sender  =await findUser(user.displayName.trim().toLowerCase());
       setTError(await transact(sender.data() , user2.data() , userAmount , userCoin)); 
     } catch (error) {
-      //console.log(error)
-      console.log("Transaction Failed !");
+      console.log("Transaction Failed !" ,error);
     }
   };
 
@@ -68,6 +79,7 @@ console.log("some",my_friends?.map((row)=>row))
     e.preventDefault();
     try {
       const  user2  =await findUser(userSearch.trim().toLowerCase());
+      //console.log(user2);
       setUserSearchBID(user2.data().BID);
       setUserSearchMetamask(user2.data().metamask);
     } catch (error) {
@@ -80,11 +92,18 @@ console.log("some",my_friends?.map((row)=>row))
   return (
     <>
       <div>
+      <button onClick={my_info}>
+          My Profile 
+        </button><br />
         Hello Welcome <br />
         User Name : {user.displayName}<br />
         Email :{user && user.email} <br />
-        BID : {user && user.uid}
+        BID : {user && user.uid} <br />
+        Total Invested Amount : {logedUser?.total_invested_amount} <br />
+        Total Received Amount :  {logedUser?.total_received_amount} <br />
+        My Metamask :  {logedUser?.metamask} <br />
       </div>
+      
       <div>
         <button onClick={handleLogout}>
           Log out

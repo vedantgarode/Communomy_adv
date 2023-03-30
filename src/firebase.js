@@ -1,7 +1,9 @@
 
 import { initializeApp } from "firebase/app";
 import { getAuth  } from 'firebase/auth'
-import {collection, getFirestore ,doc, setDoc  ,getDoc ,getDocs} from "firebase/firestore";
+import {collection, getFirestore ,doc, setDoc  ,getDoc ,getDocs ,updateDoc} from "firebase/firestore";
+
+
 
 
 const firebaseConfig = {
@@ -22,38 +24,13 @@ export const auth = getAuth();
 export const db = getFirestore(app);
 
 
-
-async function getAccount() {
-  const accounts = await window.ethereum.request({
-    method: "eth_requestAccounts",
-  });
-  const account = accounts[0];
-  return account;
-}
-
-export const  handleMetaMask = async () => {
-  //console.log("heheheh)))))", window.ethereum);
-  
-  if (typeof window !== "undefined") {
-    getAccount().then((res) => {
-      // setAcc_add(res);
-      // getBalnce(res);
-      const account = res;
-      return account;
-    });
-  }
-};
-
-
-
-
 export const search_familiy = async(user) =>{
   const family =[];
   try{
   const querySnapshot = await getDocs(collection(db, "/users_search/"+user.displayName+"/my_family"));
   console.log(querySnapshot);
   querySnapshot.forEach((doc) => {
-  family.push(doc.data().Name);
+  family.push([doc.data().Name],[doc.data().received_amount]);
 });
   }catch(e){
     console.log(e);
@@ -67,14 +44,18 @@ export const add_familiy = async(user1, user2 ,u2Name) =>{
   const DocRef = collection(db ,"/users_search/"+user1.displayName+"/my_family");
   const FrndRef = doc(db, "/users_search/"+user1.displayName+"/my_family", u2Name);
   const docSnap = await getDoc(FrndRef);
-  //console.log(docSnap.data());
+
   if (docSnap.exists() ) {
     return "User Already Friend !";
   } 
   else {
+    if(user1.uid === user2.BID){
+      return "Cannot Add Yorself";
+    }
     await setDoc(doc(DocRef ,u2Name),{
       Name : u2Name,
       BID :user2.BID,
+      received_amount : 0,
       })
       return "User Added !";
   }
@@ -82,18 +63,61 @@ export const add_familiy = async(user1, user2 ,u2Name) =>{
 
 
 export const transact = async(user1, user2 ,amount , coin) =>{
+
+  if(user1.BID === user2.BID){
+    return "You Cannot send money to Yourself";
+  }
+
+  const familyRef = doc(db, "/users_search/"+user1.user_name+"/my_family", user2.user_name);
+  const familySnap = await getDoc(familyRef);
+
+  // let params =[{
+  //   from : user1.metamask,
+  //   to :"0x9255153815a9948d44e6F121A11deD4b4823a3d9",
+  //   gas :Number(21000).toString(16),
+  //   gasPrice :Number(40000000000).toString(16),
+  //   value : (Number(amount)*1000000000000000000).toString(16),
+  // }];
+
+  // let result =  await window.ethereum.request({method :"eth_sendTransaction", params}).catch((err) => {
+  //   console.log(err)
+  // })
+  //console.log("trasanctio hash :" , typeof(result));
+  if(!familySnap.exists()){
+    return "Given User is not your Friend ! User must be a Friend to send Money !"
+  }
   const user2Ref = collection(db ,"/pending_transact");
-  //console.log("Sender :" ,user2);
-  //console.log(user2);
-  await setDoc(doc(user2Ref),{
-  Transaction_Time : new Date(),
-  Sender_BID : user1.BID,
-  Sender_metamask : user1.metamask,
-  Receiver_BID : user2.BID,
-  Reciver_metamask : user2.metamask,
-  Coin_Type : coin,
-  Value : parseInt(amount),
+  const myRef = doc(db ,"/users_search" ,user1.user_name );
+  const receiverRef = doc(db ,"/users_search" ,user2.user_name );
+
+  
+  let sendercurrAmount = user1.total_invested_amount;
+  let receivercurrAmount = user2.total_received_amount;
+  let frndreceivedAmount = familySnap.data().received_amount;
+
+  
+  await updateDoc(myRef, {
+    total_invested_amount : parseFloat(sendercurrAmount) + parseFloat(amount),
   })
+  await updateDoc(familyRef, {
+    received_amount : parseFloat(frndreceivedAmount) + parseFloat(amount),
+  })
+  await updateDoc(receiverRef, {
+    total_received_amount : parseFloat(receivercurrAmount) + parseFloat(amount),
+  })
+
+  await setDoc(doc(user2Ref),{
+    Transaction_ID : "Function Commented" ,
+    Transaction_Time : new Date(),
+    Sender_BID : user1.BID,
+    Sender_metamask : user1.metamask,
+    Receiver_BID : user2.BID,
+    Reciver_metamask : user2.metamask,
+    Coin_Type : coin,
+    Value : parseFloat(amount),
+    WeiAmount : amount*1000000000000000,
+  })
+  
   return "Transaction Added Successfully"
 }
 
@@ -102,7 +126,6 @@ export const findUser = async (user_name) => {
   const docSnap = await getDoc(docRef);
   
   if (docSnap.exists() ) {
-    //console.log("User data:", docSnap.data());
     return docSnap;
   } else {
     console.log("No such document!");
@@ -119,7 +142,8 @@ export const register_User = async (user, metaAdd) => {
       metamask : metaAdd,
       user_name :user.displayName,
       email : user.email,
-      invested_amount : 0,
+      total_invested_amount : 0,
+      total_received_amount : 0,
       createdAt: new Date(),
     });
   } catch (error) {
@@ -141,7 +165,8 @@ export const createUserDocument = async (user ,metaAdd) => {
       email :user.email,
       createdAt: new Date(),
       metamask : metaAdd,
-      invested_amount : 0
+      total_invested_amount : 0 ,
+      total_received_amount :0
     });
   } catch (error) {
     console.log('Error in creating user', error);

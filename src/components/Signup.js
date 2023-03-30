@@ -12,12 +12,9 @@ const Signup = (props) => {
   const [email, setEmail] = useState("");
   const [error, setError] = useState("");
   const [password, setPassword] = useState("");
-  //const [metamask_add, setMeta_add] = useState("");
   const { signUp } = useUserAuth();
   let navigate = useNavigate();
   const { user } = useUserAuth();
-  //console.log("hurrrrrrr",walletAdd)
-  //console.log("i am func",handleMetaMask)
   if (user) {
     navigate("/home");
   }
