@@ -55,7 +55,7 @@ const Home = () => {
     e.preventDefault();
     try {
       const  user2  =await findUser(userSearch.trim().toLowerCase());
-      setFriend(await add_familiy(user , user2.data(), userSearch));      
+      setFriend(await add_familiy(user , user2.data(), userSearch.trim().toLowerCase()));      
     } catch (error) {
       console.log("Friend addition Failed !");
     }
