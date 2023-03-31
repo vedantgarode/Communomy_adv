@@ -55,9 +55,10 @@ const Home = () => {
     e.preventDefault();
     try {
       const  user2  =await findUser(userSearch.trim().toLowerCase());
-      setFriend(await add_familiy(user , user2.data(), userSearch.trim().toLowerCase()));      
+      setFriend(await add_familiy(user , user2.data(), userSearch.trim().toLowerCase()));           
     } catch (error) {
       console.log("Friend addition Failed !");
+      console.log(error);
     }
   }
 
@@ -86,6 +87,7 @@ const Home = () => {
       setUserSearchBID("No User Found !");
       setUserSearchMetamask("No User Found !");
       console.log("No user Found !");
+      console.log(error);
     }
   };
  
@@ -156,7 +158,10 @@ const Home = () => {
         <button onClick={ Search_familiy }>
           View My Community members
         </button><br />
-        {my_friends.map((row)=><h4>{row}</h4>)}
+        {my_friends.map((row)=>
+            //index%2===0?<>{row}</>:<>: {row}<br></br></>
+            <div>Name : {row.name} <br></br> Sent : {row.receivedamount} <br></br>Received Amount :{row.sentamount} <br></br><br></br></div>
+        )}
         
         <div id="my_friends"></div>
      

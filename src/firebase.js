@@ -25,23 +25,30 @@ export const db = getFirestore(app);
 
 
 export const search_familiy = async(user) =>{
-  const family =[];
+  let family =[];
   try{
   const querySnapshot = await getDocs(collection(db, "/users_search/"+user.displayName+"/my_family"));
   console.log(querySnapshot);
   querySnapshot.forEach((doc) => {
-  family.push([doc.data().Name],[doc.data().received_amount]);
+  const person = {
+    name : doc.data().Name,
+    receivedamount : doc.data().received_amount,
+    sentamount : doc.data().sent_amount,
+  }
+  family.push(person);
+  // console.log(family);
+  // console.log(person);
 });
   }catch(e){
     console.log(e);
   }
-  console.log(family);
   return family;
 }
 
 
 export const add_familiy = async(user1, user2 ,u2Name) =>{
   const DocRef = collection(db ,"/users_search/"+user1.displayName+"/my_family");
+  const Doc2Ref = collection(db ,"/users_search/"+user2.user_name+"/my_family");
   const FrndRef = doc(db, "/users_search/"+user1.displayName+"/my_family", u2Name);
   const docSnap = await getDoc(FrndRef);
 
@@ -56,6 +63,13 @@ export const add_familiy = async(user1, user2 ,u2Name) =>{
       Name : u2Name,
       BID :user2.BID,
       received_amount : 0,
+      sent_amount :0, 
+      })
+    await setDoc(doc(Doc2Ref ,user1.displayName),{
+      Name : user1.displayName,
+      BID :user1.uid,
+      received_amount : 0,
+      sent_amount :0, 
       })
       return "User Added !";
   }
@@ -70,6 +84,8 @@ export const transact = async(user1, user2 ,amount , coin) =>{
 
   const familyRef = doc(db, "/users_search/"+user1.user_name+"/my_family", user2.user_name);
   const familySnap = await getDoc(familyRef);
+
+  
 
   // let params =[{
   //   from : user1.metamask,
@@ -86,16 +102,21 @@ export const transact = async(user1, user2 ,amount , coin) =>{
   if(!familySnap.exists()){
     return "Given User is not your Friend ! User must be a Friend to send Money !"
   }
+  const returnfamilyRef = doc(db, "/users_search/"+user2.user_name+"/my_family", user1.user_name);
+  const returnfamilySnap = await getDoc(returnfamilyRef);
+
   const user2Ref = collection(db ,"/pending_transact");
   const myRef = doc(db ,"/users_search" ,user1.user_name );
   const receiverRef = doc(db ,"/users_search" ,user2.user_name );
 
-  
+  let returnfamilyamount = returnfamilySnap.data().sent_amount;
   let sendercurrAmount = user1.total_invested_amount;
   let receivercurrAmount = user2.total_received_amount;
   let frndreceivedAmount = familySnap.data().received_amount;
 
-  
+  await updateDoc(returnfamilyRef, {
+    sent_amount : parseFloat(returnfamilyamount) + parseFloat(amount),
+  })
   await updateDoc(myRef, {
     total_invested_amount : parseFloat(sendercurrAmount) + parseFloat(amount),
   })
