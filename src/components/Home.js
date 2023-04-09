@@ -4,6 +4,7 @@ import { useNavigate } from "react-router";
 import { useUserAuth } from "../context/UserAuthContext";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 
+
 import {
   Button,
   FormControl,
@@ -14,6 +15,9 @@ import {
   Typography,
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
+
+
+
 const theme = createTheme({
   typography: {
     fontFamily: [
@@ -70,6 +74,11 @@ const Home = () => {
       console.log(error.message);
     }
   };
+
+  const switchToAdmin = async () => {
+    navigate("/admin");
+  };
+
   const Search_familiy = async (e) => {
     e.preventDefault();
     try {
@@ -144,12 +153,22 @@ const Home = () => {
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
+          overflow :"auto",
           p: 2,
           borderRadius: 2,
           boxShadow: "0px 3px 15px rgba(0, 0, 0, 0.2)",
-          maxWidth: "80%",
+          maxWidth: "90%",
+          minWidth: "60%"
         }}
       >
+        <FormGroup>
+          <Button variant="contained"  color ="error" onClick={handleLogout}>Log out</Button>
+        </FormGroup>
+        <br></br>
+        <FormGroup>
+          <Button variant="contained"  color ="error" onClick={switchToAdmin}>Admin</Button>
+        </FormGroup>
+        <br></br>
         <InfoCard sx={{ marginTop: "1rem" }}>
           <Button onClick={my_info} variant="contained" color = "success" >
             My Profile
@@ -275,9 +294,7 @@ const Home = () => {
           </FormGroup>
         </InfoCard>
         <br></br>
-        <FormGroup>
-          <Button variant="contained"  color ="error" onClick={handleLogout}>Log out</Button>
-        </FormGroup>
+        
       </Box>
     </Box>
   </ThemeProvider>
