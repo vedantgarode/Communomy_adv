@@ -81,7 +81,6 @@ export const transact = async(user1, user2 ,amount , coin) =>{
   if(user1.BID === user2.BID){
     return "You Cannot send money to Yourself";
   }
-
   const familyRef = doc(db, "/users_search/"+user1.user_name+"/my_family", user2.user_name);
   const familySnap = await getDoc(familyRef);
 

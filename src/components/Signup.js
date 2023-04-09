@@ -87,7 +87,7 @@ const Signup = (props) => {
           </Form.Group>
 
           <div>
-            {walletAdd === "" && <h1>Connect wallet to sign up</h1>}
+            {walletAdd === "" && <>Connect wallet to sign up</>}
             {walletAdd !== "" && <Button variant="primary" type="Submit">
               Sign up
             </Button>}
