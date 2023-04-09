@@ -299,7 +299,7 @@ const Home = () => {
                 <b> Sent:</b>  {row.receivedamount}
                 </Typography>
                 <Typography variant="subtitle1">
-                <b>  Received Amount:</b> {row.sentamount}
+                <b>  Received:</b> {row.sentamount}
                 </Typography>
               </Box>
             ))}
