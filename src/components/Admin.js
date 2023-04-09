@@ -32,7 +32,7 @@ const Admin = () => {
         sx={{
           borderRadius: "20 px",
           display: "flex",
-          p: 5,
+          p: 2,
           flexDirection: "column",
           justifyContent: "center",
           alignItems: "center",
