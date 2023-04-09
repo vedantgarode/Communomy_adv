@@ -10,6 +10,7 @@ import {
   orderBy,
   getDocs,
   updateDoc,
+  where,
 } from "firebase/firestore";
 
 const firebaseConfig = {
@@ -50,7 +51,7 @@ export const search_familiy = async (user) => {
   return family;
 };
 
-export const search_transact = async (user) => {
+export const search_transact = async () => {
   let transactions = [];
   try {
     const q = query(collection(db, "pending_transact"), orderBy("Transaction_Time" , "desc"));
@@ -73,6 +74,34 @@ export const search_transact = async (user) => {
   }
   return transactions;
 };
+
+
+export const search_my_transact = async (user) => {
+  let transactions = [];
+  try {
+    console.log(user.data().BID)
+    const q = query(collection(db, "pending_transact"), where("Sender_BID", "==" ,user.data().BID));
+    const querySnapshot = await getDocs(q);
+    //console.log(querySnapshot)
+    querySnapshot.forEach((doc) => {
+      console.log(doc.data());
+      const transaction = {
+        sender: doc.data().Sender_BID + "(Me)",
+        receiver: doc.data().Receiver_BID,
+        time: new Date(doc.data().Transaction_Time.seconds*1000).toString(),
+        amount: doc.data().Value,
+        transaction_id : doc.data().Transaction_ID,
+      };
+      transactions.push(transaction);
+      
+    });
+  } catch (e) {
+    console.log(e);
+  }
+  return transactions;
+};
+
+
 
 export const add_familiy = async (user1, user2, u2Name) => {
   const DocRef = collection(

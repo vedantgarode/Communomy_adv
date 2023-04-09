@@ -53,15 +53,16 @@ const Admin = () => {
           }}
         >
           <FormGroup>
-            <Button variant="contained" color="error" onClick={switchToHome}>
+            <Button variant="contained" color="secondary" onClick={switchToHome}>
               Home
             </Button>
           </FormGroup>
           <br></br>
           <FormGroup>
-            <Button variant="contained" color="error" onClick={printTransactions}>
+            <Button variant="contained" color="secondary" onClick={printTransactions}>
                 All Transactions
             </Button>
+            
           
             {transactions?.map((row) => (
                 <Box sx={{ mt: 2 }} key={row.name}>

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { findUser, transact, add_familiy, search_familiy } from "../firebase";
+import { findUser, transact, add_familiy, search_familiy ,search_my_transact } from "../firebase";
 import { useNavigate } from "react-router";
 import { useUserAuth } from "../context/UserAuthContext";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
@@ -52,6 +52,7 @@ const Home = () => {
   const [userCoin, setCoin] = useState("Etherium");
   const [user_search_metamask, setUserSearchMetamask] = useState("");
   const [user_search_bid, setUserSearchBID] = useState("");
+  const [transactions, setTransactions] = useState([]);
   const navigate = useNavigate();
 
   const my_info = async (e) => {
@@ -118,6 +119,20 @@ const Home = () => {
     }
   };
 
+
+  const printMyTransactions = async (e) => {
+    e.preventDefault();
+    try {
+      const sender = await findUser(user.displayName.trim().toLowerCase());
+      console.log();
+      setTransactions(await search_my_transact(sender));
+      console.log(transactions)
+    } catch (error) {
+      console.log("Transaction Searching Failed !");
+    }
+    
+  };
+
   const find = async (e) => {
     setUserSearchResult(userSearch);
     e.preventDefault();
@@ -140,7 +155,7 @@ const Home = () => {
       sx={{
         borderRadius : '20 px',
         display: "flex",
-        p :5 ,
+        p :2 ,
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
@@ -157,7 +172,7 @@ const Home = () => {
           p: 2,
           borderRadius: 2,
           boxShadow: "0px 3px 15px rgba(0, 0, 0, 0.2)",
-          maxWidth: "90%",
+          maxWidth: "100%",
           minWidth: "60%"
         }}
       >
@@ -166,7 +181,7 @@ const Home = () => {
         </FormGroup>
         <br></br>
         <FormGroup>
-          <Button variant="contained"  color ="error" onClick={switchToAdmin}>Admin</Button>
+          <Button variant="contained" color ="success"  onClick={switchToAdmin}>Admin</Button>
         </FormGroup>
         <br></br>
         <InfoCard sx={{ marginTop: "1rem" }}>
@@ -294,6 +309,30 @@ const Home = () => {
           </FormGroup>
         </InfoCard>
         <br></br>
+        <InfoCard>
+        <Button variant="contained" color="success" onClick={printMyTransactions}>
+                My Transactions
+        </Button>
+        {transactions?.map((row) => (
+                <Box sx={{ mt: 2 }} key={row.name}>
+                <Typography variant="subtitle1">
+                <b>Sender : </b> {row.sender}</Typography>
+                <Typography variant="subtitle1">
+                <b>Receiver :</b>  {row.receiver}
+                </Typography>
+                <Typography variant="subtitle1">
+                <b>Amount :</b> {row.amount}
+                </Typography>
+                <Typography variant="subtitle1">
+                <b>Transaction ID :</b> {row.transaction_id}
+                </Typography>
+                <Typography variant="subtitle1">
+                <b>Transaction Time :</b> {row.time}
+                </Typography>
+                <hr></hr>
+              </Box>
+            ))}
+        </InfoCard>
         
       </Box>
     </Box>
