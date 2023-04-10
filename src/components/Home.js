@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { findUser, transact, add_familiy, search_familiy ,search_my_transact } from "../firebase";
+import { findUser, transact, add_familiy, search_familiy ,search_senttransact , search_receivedtransact} from "../firebase";
 import { useNavigate } from "react-router";
 import { useUserAuth } from "../context/UserAuthContext";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
@@ -125,13 +125,27 @@ const Home = () => {
     try {
       const sender = await findUser(user.displayName.trim().toLowerCase());
       console.log();
-      setTransactions(await search_my_transact(sender));
+      setTransactions(await search_senttransact(sender));
       console.log(transactions)
     } catch (error) {
       console.log("Transaction Searching Failed !");
     }
     
   };
+
+  const printReceivedTransactions = async (e) => {
+    e.preventDefault();
+    try {
+      const sender = await findUser(user.displayName.trim().toLowerCase());
+      console.log(user.displayName.trim())
+      console.log(sender.data())
+      setTransactions(await search_receivedtransact(sender));
+      console.log(transactions)
+    } catch (error) {
+      console.log("Transaction Searching Failed !" ,error);
+    }
+  };
+
 
   const find = async (e) => {
     setUserSearchResult(userSearch);
@@ -311,8 +325,11 @@ const Home = () => {
         <br></br>
         <InfoCard>
         <Button variant="contained" color="success" onClick={printMyTransactions}>
-                My Transactions
+                Sent Transactions
         </Button>
+        <Button variant="contained" color="secondary" onClick={printReceivedTransactions}>
+                Received Transactions
+            </Button>
         {transactions?.map((row) => (
                 <Box sx={{ mt: 2 }} key={row.name}>
                 <Typography variant="subtitle1">

@@ -76,6 +76,58 @@ export const search_transact = async () => {
 };
 
 
+export const search_receivedtransact = async (user) => {
+  let transactions = [];
+  try {
+    console.log(user.data().BID)
+    const q = query(collection(db, "pending_transact"), where("Receiver_BID", "==" ,user.data().BID), orderBy("Transaction_Time" , "desc"));
+    const querySnapshot = await getDocs(q);
+    //console.log(querySnapshot)
+    querySnapshot.forEach((doc) => {
+      console.log(doc.data());
+      const transaction = {
+        sender: doc.data().Sender_BID ,
+        receiver: doc.data().Receiver_BID ,
+        time: new Date(doc.data().Transaction_Time.seconds*1000).toString(),
+        amount: doc.data().Value,
+        transaction_id : doc.data().Transaction_ID,
+      };
+      transactions.push(transaction);
+      
+    });
+  } catch (e) {
+    console.log(e);
+  }
+  return transactions;
+};
+
+export const search_senttransact = async (user) => {
+  let transactions = [];
+  try {
+    console.log(user.data().BID)
+    const q = query(collection(db, "pending_transact"), where("Sender_BID", "==" ,user.data().BID), orderBy("Transaction_Time" , "desc"));
+    const querySnapshot = await getDocs(q);
+    //console.log(querySnapshot)
+    querySnapshot.forEach((doc) => {
+      console.log(doc.data());
+      const transaction = {
+        sender: doc.data().Sender_BID + "(Me)",
+        receiver: doc.data().Receiver_BID,
+        time: new Date(doc.data().Transaction_Time.seconds*1000).toString(),
+        amount: doc.data().Value,
+        transaction_id : doc.data().Transaction_ID,
+      };
+      transactions.push(transaction);
+      
+    });
+  } catch (e) {
+    console.log(e);
+  }
+  return transactions;
+};
+
+
+
 export const search_my_transact = async (user) => {
   let transactions = [];
   try {

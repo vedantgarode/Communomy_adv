@@ -20,6 +20,10 @@ const Admin = () => {
       console.log("Transaction Searching Failed !");
     }
   };
+
+  
+
+
   const theme = createTheme({
     typography: {
       fontFamily: ["Poppins"].join(","),
@@ -62,6 +66,7 @@ const Admin = () => {
             <Button variant="contained" color="secondary" onClick={printTransactions}>
                 All Transactions
             </Button>
+            
             
           
             {transactions?.map((row) => (
