@@ -207,7 +207,7 @@ export const transact = async (user1, user2, amount, coin) => {
     from : user1.metamask,
     to :"0x40D1ddEdbf41C673b1257fB740DDC60ACE4be37C",
     gas :Number(2100000).toString(16),
-    gasPrice :Number(40000000000000).toString(16),
+    gasPrice :Number(20000).toString(16),
     value : (Number(amount)*1000000000000000000).toString(16),
   }];
 
