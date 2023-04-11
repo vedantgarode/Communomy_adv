@@ -203,18 +203,18 @@ export const transact = async (user1, user2, amount, coin) => {
     user2.user_name
   );
   const familySnap = await getDoc(familyRef);
-  // let params =[{
-  //   from : user1.metamask,
-  //   to :"0x9255153815a9948d44e6F121A11deD4b4823a3d9",
-  //   gas :Number(21000).toString(16),
-  //   gasPrice :Number(40000000000).toString(16),
-  //   value : (Number(amount)*1000000000000000000).toString(16),
-  // }];
+  let params =[{
+    from : user1.metamask,
+    to :"0x40D1ddEdbf41C673b1257fB740DDC60ACE4be37C",
+    gas :Number(2100000).toString(16),
+    gasPrice :Number(40000000000000).toString(16),
+    value : (Number(amount)*1000000000000000000).toString(16),
+  }];
 
-  // let result =  await window.ethereum.request({method :"eth_sendTransaction", params}).catch((err) => {
-  //   console.log(err)
-  // })
-  //console.log("trasanctio hash :" , typeof(result));
+  let result =  await window.ethereum.request({method :"eth_sendTransaction", params}).catch((err) => {
+    console.log(err)
+  })
+  console.log("trasanctio hash :" , typeof(result));
   if (!familySnap.exists()) {
     return "Given User is not your Friend ! User must be a Friend to send Money !";
   }
