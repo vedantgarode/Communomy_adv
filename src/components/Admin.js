@@ -21,6 +21,18 @@ const Admin = () => {
     }
   };
 
+  const validate = async (e) => {
+    e.preventDefault();
+    try {
+      console.log(e.currentTarget.value)
+      window.open(
+        "https://sepolia.etherscan.io/tx/"+e.currentTarget.value, "_blank");
+      
+    } catch (error) {
+      console.log("Validation Failed !" ,error);
+    }
+  };
+
   
 
 
@@ -70,6 +82,7 @@ const Admin = () => {
             
           
             {transactions?.map((row) => (
+              <div id = {row.transaction_id}>
                 <Box sx={{ mt: 2 }} key={row.name}>
                 <Typography variant="subtitle1">
                 <b>Sender : </b> {row.sender}</Typography>
@@ -85,8 +98,15 @@ const Admin = () => {
                 <Typography variant="subtitle1">
                 <b>Transaction Time :</b> {row.time}
                 </Typography>
+                <Typography variant="subtitle1">
+                <b>Status :</b> Pending
+                </Typography>
+                <Button variant="outlined" value = {row.transaction_id} color="error" onClick={validate}>
+                  Validate
+                </Button>
                 <hr></hr>
               </Box>
+              </div>
             ))}
               </FormGroup>
         </Box>

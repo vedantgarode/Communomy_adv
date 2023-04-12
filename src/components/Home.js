@@ -346,6 +346,7 @@ const Home = () => {
                 <Typography variant="subtitle1">
                 <b>Transaction Time :</b> {row.time}
                 </Typography>
+                
                 <hr></hr>
               </Box>
             ))}

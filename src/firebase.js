@@ -13,6 +13,7 @@ import {
   where,
 } from "firebase/firestore";
 
+
 const firebaseConfig = {
   apiKey: "AIzaSyDz2MWbf5xqGdvjbVLgJD0vHK4l7qq18IM",
   authDomain: "communomyadv.firebaseapp.com",
@@ -194,73 +195,115 @@ export const add_familiy = async (user1, user2, u2Name) => {
 };
 
 export const transact = async (user1, user2, amount, coin) => {
-  if (user1.BID === user2.BID) {
-    return "You Cannot send money to Yourself";
+  await window.ethereum.request({
+    method: 'eth_requestAccounts',
+  });
+
+  const chainId = 11155111 
+
+  if (window.ethereum.networkVersion !== chainId) {
+      try {
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: "0x"+chainId.toString(16) }]
+        });
+      } catch (err) {
+        if (err.code === 4902) {
+          await window.ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [
+              {
+                chainName: 'Sepolia Testnet',
+                chainId: "0x"+chainId.toString(16),
+                nativeCurrency: { name: 'SEP', decimals: 18, symbol: 'SEP' },
+                rpcUrls: ['https://rpc.sepolia.dev']
+              }
+            ]
+          });
+        }
+      }
+    }
+  try{
+    if (user1.BID === user2.BID) {
+      return "You Cannot send money to Yourself";
+    }
+    const familyRef = doc(
+      db,
+      "/users_search/" + user1.user_name + "/my_family",
+      user2.user_name
+    );
+    
+    const familySnap = await getDoc(familyRef);
+    if (!familySnap.exists()) {
+      return "Given User is not your Friend ! User must be a Friend to send Money !";
+    }
+
+
+    let params =[{
+      from : user1.metamask,
+      to :"0x40D1ddEdbf41C673b1257fB740DDC60ACE4be37C",
+      gas :Number(2100000).toString(16),
+      gasPrice :Number(1000000).toString(16),
+      value : (Number(amount)*1000000000000000000).toString(16),
+    }];
+  
+    let result =  await window.ethereum.request({method :"eth_sendTransaction", params}).catch((err) => {
+      console.log(err)
+    })
+    console.log("trasanctio hash :" , typeof(result));
+    if(result == null){
+      return "Transaction Rejected !"
+    }
+    const returnfamilyRef = doc(
+      db,
+      "/users_search/" + user2.user_name + "/my_family",
+      user1.user_name
+    );
+    const returnfamilySnap = await getDoc(returnfamilyRef);
+  
+    const user2Ref = collection(db, "/pending_transact");
+    const myRef = doc(db, "/users_search", user1.user_name);
+    const receiverRef = doc(db, "/users_search", user2.user_name);
+  
+    let returnfamilyamount = returnfamilySnap.data().sent_amount;
+    let sendercurrAmount = user1.total_invested_amount;
+    let receivercurrAmount = user2.total_received_amount;
+    let frndreceivedAmount = familySnap.data().received_amount;
+  
+    await updateDoc(returnfamilyRef, {
+      sent_amount: parseFloat(returnfamilyamount) + parseFloat(amount),
+    });
+    await updateDoc(myRef, {
+      total_invested_amount: parseFloat(sendercurrAmount) + parseFloat(amount),
+    });
+    await updateDoc(familyRef, {
+      received_amount: parseFloat(frndreceivedAmount) + parseFloat(amount),
+    });
+    await updateDoc(receiverRef, {
+      total_received_amount: parseFloat(receivercurrAmount) + parseFloat(amount),
+    });
+  
+    await setDoc(doc(user2Ref), {
+      Transaction_ID: result,
+      Transaction_Time: new Date(),
+      Sender_BID: user1.BID,
+      Sender_metamask: user1.metamask,
+      Receiver_BID: user2.BID,
+      Reciver_metamask: user2.metamask,
+      Coin_Type: coin,
+      Value: parseFloat(amount),
+      WeiAmount: amount * 1000000000000000,
+    });
+    return "Transaction Added Successfully";
   }
-  const familyRef = doc(
-    db,
-    "/users_search/" + user1.user_name + "/my_family",
-    user2.user_name
-  );
-  const familySnap = await getDoc(familyRef);
-  let params =[{
-    from : user1.metamask,
-    to :"0x40D1ddEdbf41C673b1257fB740DDC60ACE4be37C",
-    gas :Number(2100000).toString(16),
-    gasPrice :Number(20000).toString(16),
-    value : (Number(amount)*1000000000000000000).toString(16),
-  }];
-
-  let result =  await window.ethereum.request({method :"eth_sendTransaction", params}).catch((err) => {
-    console.log(err)
-  })
-  console.log("trasanctio hash :" , typeof(result));
-  if (!familySnap.exists()) {
-    return "Given User is not your Friend ! User must be a Friend to send Money !";
+  catch(error){
+    return "Transaction Failed Transaction Rejected !";
   }
-  const returnfamilyRef = doc(
-    db,
-    "/users_search/" + user2.user_name + "/my_family",
-    user1.user_name
-  );
-  const returnfamilySnap = await getDoc(returnfamilyRef);
+  
 
-  const user2Ref = collection(db, "/pending_transact");
-  const myRef = doc(db, "/users_search", user1.user_name);
-  const receiverRef = doc(db, "/users_search", user2.user_name);
-
-  let returnfamilyamount = returnfamilySnap.data().sent_amount;
-  let sendercurrAmount = user1.total_invested_amount;
-  let receivercurrAmount = user2.total_received_amount;
-  let frndreceivedAmount = familySnap.data().received_amount;
-
-  await updateDoc(returnfamilyRef, {
-    sent_amount: parseFloat(returnfamilyamount) + parseFloat(amount),
-  });
-  await updateDoc(myRef, {
-    total_invested_amount: parseFloat(sendercurrAmount) + parseFloat(amount),
-  });
-  await updateDoc(familyRef, {
-    received_amount: parseFloat(frndreceivedAmount) + parseFloat(amount),
-  });
-  await updateDoc(receiverRef, {
-    total_received_amount: parseFloat(receivercurrAmount) + parseFloat(amount),
-  });
-
-  await setDoc(doc(user2Ref), {
-    Transaction_ID: "Function Commented",
-    Transaction_Time: new Date(),
-    Sender_BID: user1.BID,
-    Sender_metamask: user1.metamask,
-    Receiver_BID: user2.BID,
-    Reciver_metamask: user2.metamask,
-    Coin_Type: coin,
-    Value: parseFloat(amount),
-    WeiAmount: amount * 1000000000000000,
-  });
-
-  return "Transaction Added Successfully";
+  
 };
+
 
 export const findUser = async (user_name) => {
   const docRef = doc(db, "/users_search", user_name);
