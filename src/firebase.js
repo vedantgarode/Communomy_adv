@@ -195,9 +195,14 @@ export const add_familiy = async (user1, user2, u2Name) => {
 };
 
 export const transact = async (user1, user2, amount, coin) => {
-  await window.ethereum.request({
+  try{
+    await window.ethereum.request({
     method: 'eth_requestAccounts',
   });
+  }catch(err){
+    return "Metamask Not Installed"
+  }
+  
 
   const chainId = 11155111 
 
