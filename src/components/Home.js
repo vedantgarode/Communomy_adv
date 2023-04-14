@@ -54,7 +54,7 @@ const Home = () => {
   const [user_search_bid, setUserSearchBID] = useState("");
   const [transactions, setTransactions] = useState([]);
   const navigate = useNavigate();
-
+  
   const my_info = async (e) => {
     e.preventDefault();
     try {
@@ -146,7 +146,7 @@ const Home = () => {
     }
   };
 
-
+  
   const find = async (e) => {
     setUserSearchResult(userSearch);
     e.preventDefault();
