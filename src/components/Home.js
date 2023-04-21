@@ -103,15 +103,16 @@ const Home = () => {
 
   const transaction = async (e) => {
     e.preventDefault();
-    if (userAmount < 0 || userAmount === "0" || userAmount === "") {
+    console.log(userAmount)
+    if (userAmount < 0 || userAmount === 0 || userAmount === "" || userAmount === undefined || userAmount === null ) {
       setTError("Enter Valid Amount !");
     } else {
       try {
         const user2 = await findUser(userSearch.trim().toLowerCase());
         const sender = await findUser(user.displayName.trim().toLowerCase());
-        setTError(
+          setTError(
           await transact(sender.data(), user2.data(), userAmount, userCoin)
-        );
+        ); 
       } catch (error) {
         setTError("Select Valid User !");
         console.log("Transaction Failed !", error);
