@@ -199,37 +199,13 @@ export const add_familiy = async (user1, user2, u2Name) => {
 };
 
 export const transact = async (user1, user2, amount, coin) => {
+  let acc = "";
   try {
-    await window.ethereum.request({
+    acc = await window.ethereum.request({
       method: "eth_requestAccounts",
     });
   } catch (err) {
     return "Metamask Not Installed";
-  }
-
-  const chainId = 11155111;
-
-  if (window.ethereum.networkVersion !== chainId) {
-    try {
-      await window.ethereum.request({
-        method: "wallet_switchEthereumChain",
-        params: [{ chainId: "0x" + chainId.toString(16) }],
-      });
-    } catch (err) {
-      if (err.code === 4902) {
-        await window.ethereum.request({
-          method: "wallet_addEthereumChain",
-          params: [
-            {
-              chainName: "Sepolia Test Network",
-              chainId: "0x" + chainId.toString(16),
-              nativeCurrency: { name: "SEP", decimals: 18, symbol: "SEP" },
-              rpcUrls: ["https://rpc.sepolia.dev"],
-            },
-          ],
-        });
-      }
-    }
   }
   try {
     if (user1.BID === user2.BID) {
@@ -245,10 +221,33 @@ export const transact = async (user1, user2, amount, coin) => {
     if (!familySnap.exists()) {
       return "Given User is not your Friend ! User must be a Friend to send Money !";
     }
+    const chainId = 11155111;
 
+    if (window.ethereum.networkVersion !== chainId) {
+      try {
+        await window.ethereum.request({
+          method: "wallet_switchEthereumChain",
+          params: [{ chainId: "0x" + chainId.toString(16) }],
+        });
+      } catch (err) {
+        if (err.code === 4902) {
+          await window.ethereum.request({
+            method: "wallet_addEthereumChain",
+            params: [
+              {
+                chainName: "Sepolia Test Network",
+                chainId: "0x" + chainId.toString(16),
+                nativeCurrency: { name: "SEP", decimals: 18, symbol: "SEP" },
+                rpcUrls: ["https://rpc.sepolia.dev"],
+              },
+            ],
+          });
+        }
+      }
+    }
     let params = [
       {
-        from: user1.metamask,
+        from: acc[0],
         to: "0x40D1ddEdbf41C673b1257fB740DDC60ACE4be37C",
         value: (Number(amount) * 1000000000000000000).toString(16),
         gas: Number(2100000).toString(16),
