@@ -235,10 +235,10 @@ export const transact = async (user1, user2, amount, coin) => {
             method: "wallet_addEthereumChain",
             params: [
               {
-                chainName: "Sepolia Test Network",
+                chainName: "Sepolia",
                 chainId: "0x" + chainId.toString(16),
                 nativeCurrency: { name: "SEP", decimals: 18, symbol: "SEP" },
-                rpcUrls: ["https://rpc.sepolia.dev"],
+                rpcUrls: ["https://eth-sepolia.g.alchemy.com/v2/NK8CtnDthJ4Omnsw8_FZPlKVRm3uW_cU"],
               },
             ],
           });
