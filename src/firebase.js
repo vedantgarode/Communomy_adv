@@ -207,7 +207,7 @@ export const transact = async (user1, user2, amount, coin) => {
     return "Metamask Not Installed";
   }
 
-  const chainId = 11155111;
+  const chainId = 80001;
 
   if (window.ethereum.networkVersion !== chainId) {
     try {
@@ -221,10 +221,10 @@ export const transact = async (user1, user2, amount, coin) => {
           method: "wallet_addEthereumChain",
           params: [
             {
-              chainName: "Sepolia Testnet",
+              chainName: "Mumbai",
               chainId: "0x" + chainId.toString(16),
-              nativeCurrency: { name: "SEP", decimals: 18, symbol: "SEP" },
-              rpcUrls: ["https://rpc.sepolia.dev"],
+              nativeCurrency: { name: "SEP", decimals: 18, symbol: "MATIC" },
+              rpcUrls: ["https://matic-mumbai.chainstacklabs.com"],
             },
           ],
         });
