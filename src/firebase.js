@@ -263,7 +263,7 @@ export const transact = async (user1, user2, amount, coin) => {
       });
     } catch (e) {
       console.log("Failed");
-      return "Error :" + e.code;
+      return "Error :" + e.code + "----" + e.message;
     }
 
     console.log("trasanctio hash :", result);
