@@ -201,12 +201,11 @@ export const add_familiy = async (user1, user2, u2Name) => {
 export const transact = async (user1, user2, amount, coin) => {
   let acc = "";
   try {
-    acc = await window.ethereum.request({
-      method: "eth_requestAccounts",
-    });
+    acc = await window.ethereum.enable();
   } catch (err) {
     return "Metamask Not Installed";
   }
+
   try {
     if (user1.BID === user2.BID) {
       return "You Cannot send money to Yourself";
@@ -223,28 +222,30 @@ export const transact = async (user1, user2, amount, coin) => {
     }
     const chainId = 11155111;
 
-    if (window.ethereum.networkVersion !== chainId) {
-      try {
-        await window.ethereum.request({
-          method: "wallet_switchEthereumChain",
-          params: [{ chainId: "0x" + chainId.toString(16) }],
-        });
-      } catch (err) {
-        if (err.code === 4902) {
-          await window.ethereum.request({
-            method: "wallet_addEthereumChain",
-            params: [
-              {
-                chainId: "0x" + chainId.toString(16),
-                rpcUrls: ["https://rpc.sepolia.org" ,"https://rpc.sepolia.dev" , "https://rpc.sepolia.online" , "https://www.sepoliarpc.space"],
-                chainName: "Sepolia",
-                nativeCurrency: { name: "SEP", decimals: 18, symbol: "SEP" },
-              },
-            ],
-          });
-        }
-      }
+if (window.ethereum.networkVersion !== chainId) {
+  try {
+    await window.ethereum.enable();
+    await window.ethereum.request({
+      method: "wallet_switchEthereumChain",
+      params: [{ chainId: "0x" + chainId.toString(16) }],
+    });
+  } catch (err) {
+    if (err.code === 4902) {
+      await window.ethereum.enable();
+      await window.ethereum.request({
+        method: "wallet_addEthereumChain",
+        params: [
+          {
+            chainId: "0x" + chainId.toString(16),
+            rpcUrls: ["https://rpc.sepolia.org" ,"https://rpc.sepolia.dev" , "https://rpc.sepolia.online" , "https://www.sepoliarpc.space"],
+            chainName: "Sepolia",
+            nativeCurrency: { name: "SEP", decimals: 18, symbol: "SEP" },
+          },
+        ],
+      });
     }
+  }
+}
     let params = [
       {
         from: acc[0],
