@@ -222,30 +222,33 @@ export const transact = async (user1, user2, amount, coin) => {
     }
     const chainId = 11155111;
 
-if (window.ethereum.networkVersion !== chainId) {
-  try {
-    await window.ethereum.enable();
-    await window.ethereum.request({
-      method: "wallet_switchEthereumChain",
-      params: [{ chainId: "0x" + chainId.toString(16) }],
-    });
-  } catch (err) {
-    if (err.code === 4902) {
-      await window.ethereum.enable();
-      await window.ethereum.request({
-        method: "wallet_addEthereumChain",
-        params: [
-          {
-            chainId: "0x" + chainId.toString(16),
-            rpcUrls: ["https://rpc.sepolia.org" ,"https://rpc.sepolia.dev" , "https://rpc.sepolia.online" , "https://www.sepoliarpc.space"],
-            chainName: "Sepolia",
-            nativeCurrency: { name: "SEP", decimals: 18, symbol: "SEP" },
-          },
-        ],
-      });
+    if (window.ethereum.networkVersion !== chainId) {
+      try {
+        await window.ethereum.enable();
+        await window.ethereum.request({
+          method: "wallet_switchEthereumChain",
+          params: [{ chainId: "0x" + chainId.toString(16) }],
+        });
+      } catch (err) {
+        await window.ethereum.enable();
+        await window.ethereum.request({
+          method: "wallet_addEthereumChain",
+          params: [
+            {
+              chainId: "0x" + chainId.toString(16),
+              rpcUrls: [
+                "https://rpc.sepolia.org",
+                "https://rpc.sepolia.dev",
+                "https://rpc.sepolia.online",
+                "https://www.sepoliarpc.space",
+              ],
+              chainName: "Sepolia",
+              nativeCurrency: { name: "SEP", decimals: 18, symbol: "SEP" },
+            },
+          ],
+        });
+      }
     }
-  }
-}
     let params = [
       {
         from: acc[0],
