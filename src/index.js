@@ -13,7 +13,7 @@ import { Provider } from 'react-redux';
 import App from 'layout/App';
 import reducer from 'store/reducer';
 import * as serviceWorker from 'serviceWorker';
-
+import { ToastContainer } from 'react-toastify';
 const store = configureStore({ reducer });
 
 const root = createRoot(document.getElementById('root'));
@@ -21,12 +21,14 @@ const root = createRoot(document.getElementById('root'));
 // ==============================|| MAIN - REACT DOM RENDER  ||==============
 
 root.render(
-  <Provider store={store}>
-    <BrowserRouter basename={process.env.REACT_APP_BASE_NAME}>
-      <App />
-      {/* <MainRoutes/> */}
-    </BrowserRouter>
-  </Provider>
+  <>
+    <ToastContainer />
+    <Provider store={store}>
+      <BrowserRouter basename={process.env.REACT_APP_BASE_NAME}>
+        <App />
+      </BrowserRouter>
+    </Provider>
+  </>
 );
 
 // If you want your app to work offline and load faster, you can change

@@ -12,6 +12,9 @@ import theme from 'themes';
 // import Routes from 'routes/index';
 import MainRoutes from 'routes/MainRoutes';
 import NavigationScroll from './NavigationScroll';
+import { UserAuthContextProvider } from 'context/UserAuthContext';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'; // Make sure to import the CSS styles
 
 // ==============================|| APP ||============================== //
 
@@ -21,14 +24,19 @@ const App = () => {
   return (
     <>
       {
-        <NavigationScroll>
-          <StyledEngineProvider injectFirst>
-            <ThemeProvider theme={theme(customization)}>
-              <CssBaseline />
-              <MainRoutes />
-            </ThemeProvider>
-          </StyledEngineProvider>
-        </NavigationScroll>
+        <>
+          <NavigationScroll>
+            <StyledEngineProvider injectFirst>
+              <ThemeProvider theme={theme(customization)}>
+                <CssBaseline />
+                <UserAuthContextProvider>
+                  <MainRoutes />
+                </UserAuthContextProvider>
+                <ToastContainer/>
+              </ThemeProvider>
+            </StyledEngineProvider>
+          </NavigationScroll>
+        </>
       }
     </>
   );

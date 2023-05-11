@@ -1,7 +1,8 @@
 import React from 'react';
-
+import { useNavigate } from 'react-router';
 // material-ui
 import { useTheme } from '@mui/material/styles';
+import { useUserAuth } from 'context/UserAuthContext';
 import {
   Box,
   Button,
@@ -31,6 +32,12 @@ import Google from 'assets/images/social-google.svg';
 const FirebaseLogin = ({ ...rest }) => {
   const theme = useTheme();
   const [showPassword, setShowPassword] = React.useState(false);
+  const { user } = useUserAuth();
+  const { logIn } = useUserAuth();
+  const navigate = useNavigate();
+  if (user) {
+    navigate('/dashboard');
+  }
 
   const handleClickShowPassword = () => {
     setShowPassword(!showPassword);
@@ -39,7 +46,16 @@ const FirebaseLogin = ({ ...rest }) => {
   const handleMouseDownPassword = (event) => {
     event.preventDefault();
   };
-
+  const handleSubmit = async (values, { setErrors, setStatus, setSubmitting }) => {
+    try {
+      await logIn(values.email, values.password);
+      navigate('/dashboard');
+    } catch (error) {
+      setStatus({ success: false });
+      setErrors({ submit: error.message });
+      setSubmitting(false);
+    }
+  };
   return (
     <>
       <Grid container justifyContent="center">
@@ -93,6 +109,7 @@ const FirebaseLogin = ({ ...rest }) => {
           email: Yup.string().email('Must be a valid email').max(255).required('Email is required'),
           password: Yup.string().max(255).required('Password is required')
         })}
+        onSubmit={handleSubmit}
       >
         {({ errors, handleBlur, handleChange, handleSubmit, isSubmitting, touched, values }) => (
           <form noValidate onSubmit={handleSubmit} {...rest}>

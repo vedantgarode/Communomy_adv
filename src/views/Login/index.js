@@ -1,9 +1,10 @@
 import React from 'react';
 import { Link as RouterLink } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 // material-ui
 import { useTheme } from '@mui/material/styles';
-import { Card, CardContent, Typography, Grid, Button } from '@mui/material';
+import { Card, CardContent, Typography, Grid } from '@mui/material';
 
 // project import
 import AuthLogin from './FirebaseLogin';
@@ -62,8 +63,8 @@ const Login = () => {
               </Grid>
               <Grid container justifyContent="flex-start" sx={{ mt: theme.spacing(2), mb: theme.spacing(1) }}>
                 <Grid item>
-                  <Typography variant="subtitle2" color="secondary" sx={{ textDecoration: 'none', pl: 2 }}>
-                    <Button>Create new account</Button>
+                  <Typography variant="subtitle2" color="secondary" component={Link} to="/register" sx={{ textDecoration: 'none', pl: 2 }}>
+                    Create New account
                   </Typography>
                 </Grid>
               </Grid>
