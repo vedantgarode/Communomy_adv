@@ -22,7 +22,7 @@ const CommunityTable = () => {
   };
   useEffect(() => {
     Search_familiy();
-  }, [user]);
+  }, [my_friends2]);
   console.log('SearchFa', my_friends);
 
   useEffect(() => {
@@ -82,7 +82,7 @@ const CommunityTable = () => {
 
   const options = {
     selectableRows: false,
-    filterType: 'checkbox'
+    filterType: 'dropdown'
   };
   return (
     <div style={{ boxSizing: 'content-box' }}>

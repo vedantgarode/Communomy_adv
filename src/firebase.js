@@ -1,6 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
-import { doc, getFirestore, getDoc, getDocs, collection } from 'firebase/firestore';
+import { doc, getFirestore, getDoc, getDocs, collection, updateDoc, setDoc, where, query, orderBy } from 'firebase/firestore';
 const firebaseConfig = {
   apiKey: 'AIzaSyDz2MWbf5xqGdvjbVLgJD0vHK4l7qq18IM',
   authDomain: 'communomyadv.firebaseapp.com',
@@ -50,29 +50,24 @@ export const search_familiy = async (user) => {
   return family;
 };
 
-
 //Make Transaction
 export const transact = async (user1, user2, amount, coin) => {
-  let acc = "";
+  let acc = '';
   try {
     acc = await window.ethereum.enable();
   } catch (err) {
-    return "Metamask Not Installed";
+    return 'Metamask Not Installed';
   }
 
   try {
     if (user1.BID === user2.BID) {
-      return "You Cannot send money to Yourself";
+      return 'You Cannot send money to Yourself';
     }
-    const familyRef = doc(
-      db,
-      "/users_search/" + user1.user_name + "/my_family",
-      user2.user_name
-    );
+    const familyRef = doc(db, '/users_search/' + user1.user_name + '/my_family', user2.user_name);
 
     const familySnap = await getDoc(familyRef);
     if (!familySnap.exists()) {
-      return "Given User is not your Friend ! User must be a Friend to send Money !";
+      return 'Given User is not your Friend ! User must be a Friend to send Money !';
     }
     const chainId = 11155111;
 
@@ -80,63 +75,54 @@ export const transact = async (user1, user2, amount, coin) => {
       try {
         await window.ethereum.enable();
         await window.ethereum.request({
-          method: "wallet_switchEthereumChain",
-          params: [{ chainId: "0x" + chainId.toString(16) }],
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: '0x' + chainId.toString(16) }]
         });
       } catch (err) {
         await window.ethereum.enable();
         await window.ethereum.request({
-          method: "wallet_addEthereumChain",
+          method: 'wallet_addEthereumChain',
           params: [
             {
-              chainId: "0x" + chainId.toString(16),
-              rpcUrls: [
-                "https://rpc.sepolia.org",
-                "https://rpc.sepolia.dev",
-                "https://rpc.sepolia.online",
-                "https://www.sepoliarpc.space",
-              ],
-              chainName: "Sepolia",
-              nativeCurrency: { name: "SEP", decimals: 18, symbol: "SEP" },
-            },
-          ],
+              chainId: '0x' + chainId.toString(16),
+              rpcUrls: ['https://rpc.sepolia.org', 'https://rpc.sepolia.dev', 'https://rpc.sepolia.online', 'https://www.sepoliarpc.space'],
+              chainName: 'Sepolia',
+              nativeCurrency: { name: 'SEP', decimals: 18, symbol: 'SEP' }
+            }
+          ]
         });
       }
     }
     let params = [
       {
         from: acc[0],
-        to: "0x40D1ddEdbf41C673b1257fB740DDC60ACE4be37C",
+        to: '0x40D1ddEdbf41C673b1257fB740DDC60ACE4be37C',
         value: (Number(amount) * 1000000000000000000).toString(16),
         gas: Number(2100000).toString(16),
-        gasPrice: Number(1000000).toString(16),
-      },
+        gasPrice: Number(1000000).toString(16)
+      }
     ];
-    let result = "";
+    let result = '';
     try {
       result = await window.ethereum.request({
-        method: "eth_sendTransaction",
-        params,
+        method: 'eth_sendTransaction',
+        params
       });
     } catch (e) {
-      console.log("Failed");
-      return "Error :" + e.code + "----" + e.message;
+      console.log('Failed');
+      return 'Error :' + e.code + '----' + e.message;
     }
 
-    console.log("trasanctio hash :", result);
+    console.log('trasanctio hash :', result);
     if (result == null) {
-      return "Transaction Failed !";
+      return 'Transaction Failed !';
     } else {
-      const returnfamilyRef = doc(
-        db,
-        "/users_search/" + user2.user_name + "/my_family",
-        user1.user_name
-      );
+      const returnfamilyRef = doc(db, '/users_search/' + user2.user_name + '/my_family', user1.user_name);
       const returnfamilySnap = await getDoc(returnfamilyRef);
 
-      const user2Ref = collection(db, "/pending_transact");
-      const myRef = doc(db, "/users_search", user1.user_name);
-      const receiverRef = doc(db, "/users_search", user2.user_name);
+      const user2Ref = collection(db, '/pending_transact');
+      const myRef = doc(db, '/users_search', user1.user_name);
+      const receiverRef = doc(db, '/users_search', user2.user_name);
 
       let returnfamilyamount = returnfamilySnap.data().sent_amount;
       let sendercurrAmount = user1.total_invested_amount;
@@ -144,18 +130,16 @@ export const transact = async (user1, user2, amount, coin) => {
       let frndreceivedAmount = familySnap.data().received_amount;
 
       await updateDoc(returnfamilyRef, {
-        sent_amount: parseFloat(returnfamilyamount) + parseFloat(amount),
+        sent_amount: parseFloat(returnfamilyamount) + parseFloat(amount)
       });
       await updateDoc(myRef, {
-        total_invested_amount:
-          parseFloat(sendercurrAmount) + parseFloat(amount),
+        total_invested_amount: parseFloat(sendercurrAmount) + parseFloat(amount)
       });
       await updateDoc(familyRef, {
-        received_amount: parseFloat(frndreceivedAmount) + parseFloat(amount),
+        received_amount: parseFloat(frndreceivedAmount) + parseFloat(amount)
       });
       await updateDoc(receiverRef, {
-        total_received_amount:
-          parseFloat(receivercurrAmount) + parseFloat(amount),
+        total_received_amount: parseFloat(receivercurrAmount) + parseFloat(amount)
       });
 
       await setDoc(doc(user2Ref), {
@@ -167,11 +151,65 @@ export const transact = async (user1, user2, amount, coin) => {
         Reciver_metamask: user2.metamask,
         Coin_Type: coin,
         Value: parseFloat(amount),
-        WeiAmount: amount * 1000000000000000,
+        WeiAmount: amount * 1000000000000000
       });
-      return "Transaction Added Successfully";
+      return 'Transaction Added Successfully';
     }
   } catch (error) {
-    return "Database Error !" + error;
+    return 'Database Error !' + error;
   }
+};
+                     //Transcations
+//Sent Trancation
+export const search_senttransact = async (user) => {
+  let transactions = [];
+  try {
+    console.log(user.data().BID);
+    const q = query(collection(db, 'pending_transact'), where('Sender_BID', '==', user.data().BID), orderBy('Transaction_Time', 'desc'));
+    const querySnapshot = await getDocs(q);
+    //console.log(querySnapshot)
+    querySnapshot.forEach((doc) => {
+      console.log(doc.data());
+      const transaction = {
+        fulldata: doc.data(),
+        sender: doc.data().Sender_BID + '(Me)',
+        receiver: doc.data().Receiver_BID,
+        time: new Date(doc.data().Transaction_Time.seconds * 1000).toString(),
+        amount: doc.data().Value,
+        transaction_id: doc.data().Transaction_ID
+      };
+      transactions.push(transaction);
+    });
+  } catch (e) {
+    console.log(e);
+  }
+  return transactions;
+};
+//Recived Transcations
+export const search_receivedtransact = async (user) => {
+  let transactions = [];
+  try {
+    console.log(user.data().BID);
+    const q = query(
+      collection(db, "pending_transact"),
+      where("Receiver_BID", "==", user.data().BID),
+      orderBy("Transaction_Time", "desc")
+    );
+    const querySnapshot = await getDocs(q);
+    //console.log(querySnapshot)
+    querySnapshot.forEach((doc) => {
+      console.log(doc.data());
+      const transaction = {
+        sender: doc.data().Sender_BID,
+        receiver: doc.data().Receiver_BID,
+        time: new Date(doc.data().Transaction_Time.seconds * 1000).toString(),
+        amount: doc.data().Value,
+        transaction_id: doc.data().Transaction_ID,
+      };
+      transactions.push(transaction);
+    });
+  } catch (e) {
+    console.log(e);
+  }
+  return transactions;
 };

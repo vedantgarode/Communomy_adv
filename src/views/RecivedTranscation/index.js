@@ -6,15 +6,14 @@ import { Card, CardHeader, CardContent, Divider, Grid, Typography } from '@mui/m
 
 // project import
 import Breadcrumb from 'component/Breadcrumb';
-import CommunityTable from './CommunityTable';
-import Member from './Member';
-
+import { gridSpacing } from 'config.js';
+import Rcvd_transcationTable from './Rcvd_transcationTable';
 // ==============================|| SAMPLE PAGE ||============================== //
 
-const Manage_Community = () => {
+const Rcvd_Transcations = () => {
   return (
     <>
-      <Breadcrumb title="Manage Your Community">
+      <Breadcrumb title="Recived Transcations">
         {/* <Typography component={Link} to="/" variant="subtitle2" color="inherit" className="link-breadcrumb">
           Manage
         </Typography>
@@ -22,34 +21,20 @@ const Manage_Community = () => {
           Sample Page
         </Typography> */}
       </Breadcrumb>
-      <Grid container spacing="2">
-        <Grid item xs={12} lg={8} sm={8} md={8}>
+      <Grid container spacing={gridSpacing}>
+        <Grid item>
+          <Card></Card>
           <Card>
             <CardHeader
               title={
                 <Typography component="div" className="card-header">
-                  Community
+                  Recived transcations
                 </Typography>
               }
             />
             <Divider />
             <CardContent>
-              <CommunityTable />
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} lg={4} sm={4} md={4}>
-          <Card>
-            <CardHeader
-              title={
-                <Typography component="div" className="card-header">
-                  Add Member
-                </Typography>
-              }
-            />
-            <Divider />
-            <CardContent>
-              <Member />
+              <Rcvd_transcationTable />
             </CardContent>
           </Card>
         </Grid>
@@ -58,4 +43,4 @@ const Manage_Community = () => {
   );
 };
 
-export default Manage_Community;
+export default Rcvd_Transcations;
