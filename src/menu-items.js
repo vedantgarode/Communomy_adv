@@ -58,44 +58,44 @@ export default {
       ]
     },
 
-    // {
-    //   id: 'pages',
-    //   title: 'Pages',
-    //   caption: 'Prebuild Pages',
-    //   type: 'group',
-    //   icon: icons['NavigationOutlinedIcon'],
-    //   children: [
-    //     {
-    //       id: 'sample-page',
-    //       title: 'Sample Page',
-    //       type: 'item',
-    //       url: '/sample-page',
-    //       icon: icons['ChromeReaderModeOutlinedIcon']
-    //     },
-    //     {
-    //       id: 'auth',
-    //       title: 'Authentication',
-    //       type: 'collapse',
-    //       icon: icons['SecurityOutlinedIcon'],
-    //       children: [
-    //         {
-    //           id: 'login-1',
-    //           title: 'Login',
-    //           type: 'item',
-    //           url: '/application/login',
-    //           target: true
-    //         },
-    //         {
-    //           id: 'register',
-    //           title: 'Register',
-    //           type: 'item',
-    //           url: '/application/register',
-    //           target: true
-    //         }
-    //       ]
-    //     }
-    //   ]
-    // },
+    {
+      id: 'pages',
+      title: 'Pages',
+      caption: 'Prebuild Pages',
+      type: 'group',
+      icon: icons['NavigationOutlinedIcon'],
+      children: [
+        {
+          id: 'sample-page',
+          title: 'Sample Page',
+          type: 'item',
+          url: '/sample-page',
+          icon: icons['ChromeReaderModeOutlinedIcon']
+        },
+        {
+          id: 'auth',
+          title: 'Authentication',
+          type: 'collapse',
+          icon: icons['SecurityOutlinedIcon'],
+          children: [
+            {
+              id: 'login-1',
+              title: 'Login',
+              type: 'item',
+              url: '/application/login',
+              target: true
+            },
+            {
+              id: 'register',
+              title: 'Register',
+              type: 'item',
+              url: '/application/register',
+              target: true
+            }
+          ]
+        }
+      ]
+    },
     {
       id: 'transactions',
       title: 'Transactions',
@@ -107,8 +107,7 @@ export default {
           title: 'Send Transaction',
           type: 'item',
           url: '/send-transcations',
-          icon: icons['AppsOutlinedIcon'],
-
+          icon: icons['AppsOutlinedIcon']
         },
         {
           id: 'rcvdtnx',
@@ -116,6 +115,29 @@ export default {
           type: 'item',
           url: '/recived-transcations',
           icon: icons['FormatColorTextOutlinedIcon']
+        }
+      ]
+    },
+
+    {
+      id: 'auth',
+      title: 'Authentication',
+      type: 'collapse',
+      icon: icons['SecurityOutlinedIcon'],
+      children: [
+        {
+          id: 'login-1',
+          title: 'Login',
+          type: 'item',
+          url: '/application/login',
+          target: true
+        },
+        {
+          id: 'register',
+          title: 'Register',
+          type: 'item',
+          url: '/application/register',
+          target: true
         }
       ]
     },

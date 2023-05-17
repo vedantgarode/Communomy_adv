@@ -13,8 +13,8 @@ const RegisterPage = Loadable(lazy(() => import('../views/Register')));
 const LoginPage = Loadable(lazy(() => import('../views/Login')));
 const SamplePage = Loadable(lazy(() => import('../views/SamplePage')));
 const Manage_Community = Loadable(lazy(() => import('../views/Manage_Community')));
-const Send_Transcation = Loadable(lazy(()=>import('../views/Send_Transcation')))
-const Rcvd_Transcations = Loadable(lazy(()=>import('../views/RecivedTranscation')))
+const Send_Transcation = Loadable(lazy(() => import('../views/Send_Transcation')));
+const Rcvd_Transcations = Loadable(lazy(() => import('../views/RecivedTranscation')));
 
 // ==============================|| MAIN ROUTES ||============================== //
 export default function MainRoutes() {

@@ -14,15 +14,14 @@ import ReportCard from './ReportCard';
 import { gridSpacing } from 'config.js';
 
 // assets
-import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import MonetizationOnTwoTone from '@mui/icons-material/MonetizationOnTwoTone';
-import DescriptionTwoTone from '@mui/icons-material/DescriptionTwoTone';
 import ThumbUpAltTwoTone from '@mui/icons-material/ThumbUpAltTwoTone';
-import CalendarTodayTwoTone from '@mui/icons-material/CalendarTodayTwoTone';
+import Diversity1TwoToneIcon from '@mui/icons-material/Diversity1TwoTone';
 //firebaseimport
 import { findUser } from '../../../src/firebase';
 import { useUserAuth } from 'context/UserAuthContext';
+import { search_familiy } from '../../../src/firebase';
 // custom style
 
 const FlatCardBlock = styled((props) => <Grid item sm={6} xs={12} {...props} />)(({ theme }) => ({
@@ -43,6 +42,23 @@ const Default = () => {
   const theme = useTheme();
   const { user } = useUserAuth();
   const [loggedUser, setloggedUser] = useState([]);
+  const [my_friends, SearchFriend] = useState([]);
+  const Search_familiy = async () => {
+    try {
+      SearchFriend(await search_familiy(user));
+    } catch (error) {
+      console.log('Friend Searching Failed !');
+    }
+  };
+  useEffect(() => {
+    Search_familiy();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+  console.log('Das', my_friends.length);
+  // let Community_total =0
+  // my_friends.forEach(element => {
+  // });
+
   const my_info = async () => {
     try {
       if (user && user.displayName) {
@@ -55,6 +71,7 @@ const Default = () => {
 
   useEffect(() => {
     my_info();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
   console.log('loff', loggedUser, user.displayName);
   return (
@@ -63,32 +80,22 @@ const Default = () => {
         <Grid container spacing={gridSpacing}>
           <Grid item lg={3} sm={6} xs={12}>
             <ReportCard
-              primary="$30200"
-              secondary="In my metamask"
-              color={theme.palette.warning.main}
-              footerData="10% changes on profit"
-              iconPrimary={MonetizationOnTwoTone}
-              iconFooter={TrendingUpIcon}
-            />
-          </Grid>
-          <Grid item lg={3} sm={6} xs={12}>
-            <ReportCard
-              primary={loggedUser?.total_invested_amount}
+              primary={parseFloat(loggedUser?.total_invested_amount).toFixed(7) + '~'}
               secondary="Invested Amount"
-              color={theme.palette.error.main}
-              footerData="28% task performance"
-              iconPrimary={CalendarTodayTwoTone}
-              iconFooter={TrendingDownIcon}
+              color={theme.palette.warning.main}
+              footerData="Investments"
+              iconPrimary={MonetizationOnTwoTone}
+              // iconFooter={TrendingUpIcon}
             />
           </Grid>
           <Grid item lg={3} sm={6} xs={12}>
             <ReportCard
-              primary="290+"
-              secondary="Total Send"
+              primary={(parseFloat(loggedUser?.total_invested_amount) * 1.04).toFixed(7) + '~'}
+              secondary="Expected Returns"
               color={theme.palette.success.main}
-              footerData="10k daily views"
-              iconPrimary={DescriptionTwoTone}
-              iconFooter={TrendingUpIcon}
+              footerData="Expected Returns YoY"
+              iconPrimary={MonetizationOnTwoTone}
+              // iconFooter={TrendingDownIcon}
             />
           </Grid>
           <Grid item lg={3} sm={6} xs={12}>
@@ -96,9 +103,19 @@ const Default = () => {
               primary={loggedUser?.total_received_amount}
               secondary="Total Recived"
               color={theme.palette.primary.main}
-              footerData="1k download in App store"
+              footerData="Total Amount Recived"
               iconPrimary={ThumbUpAltTwoTone}
-              iconFooter={TrendingUpIcon}
+              // iconFooter={TrendingUpIcon}
+            />
+          </Grid>
+          <Grid item lg={3} sm={6} xs={12}>
+            <ReportCard
+              primary={my_friends?.length}
+              secondary="Members"
+              color={theme.palette.error.main}
+              footerData="People in Your Community"
+              iconPrimary={Diversity1TwoToneIcon}
+              // iconFooter={TrendingUpIcon}
             />
           </Grid>
         </Grid>
@@ -112,17 +129,17 @@ const Default = () => {
                   <Grid item xs={12}>
                     <SalesLineCard
                       chartData={SalesLineCardData}
-                      title="Sales Per Day"
+                      title="Total Assets"
                       percentage="3%"
                       icon={<TrendingDownIcon />}
                       footerData={[
                         {
                           value: '$4230',
-                          label: 'Total Revenue'
+                          label: 'Total Asset'
                         },
                         {
                           value: '321',
-                          label: 'Today Sales'
+                          label: 'Expected Return'
                         }
                       ]}
                     />
@@ -166,7 +183,12 @@ const Default = () => {
                 </Grid>
               </Grid>
               <Grid item xs={12} sm={6}>
-                <RevenuChartCard chartData={RevenuChartCardData} />
+                <RevenuChartCard
+                  chartData={RevenuChartCardData}
+                  totat_inv={parseFloat(loggedUser?.total_invested_amount).toFixed(7)}
+                  totat_rcv={parseFloat(loggedUser?.total_received_amount).toFixed(7)}
+                  totat_ecp={(parseFloat(loggedUser?.total_invested_amount) * 1.04).toFixed(7)}
+                />
               </Grid>
             </Grid>
           </Grid>
@@ -175,88 +197,39 @@ const Default = () => {
               <CardHeader
                 title={
                   <Typography component="div" className="card-header">
-                    Traffic Sources
+                    Contributions
                   </Typography>
                 }
               />
               <Divider />
               <CardContent>
                 <Grid container spacing={gridSpacing}>
-                  <Grid item xs={12}>
-                    <Grid container alignItems="center" spacing={1}>
-                      <Grid item sm zeroMinWidth>
-                        <Typography variant="body2">Direct</Typography>
+                  {my_friends?.map((row) => {
+                    return (
+                      <Grid item xs={12} key={row.name}>
+                        <Grid container alignItems="center" spacing={1}>
+                          <Grid item sm zeroMinWidth>
+                            <Typography variant="body2">{row?.name}</Typography>
+                          </Grid>
+                          <Grid item>
+                            <Typography variant="body2" align="right">
+                              {parseFloat(
+                                (parseFloat(row.receivedamount).toFixed(7) / parseFloat(loggedUser?.total_invested_amount).toFixed(7)) * 100
+                              ).toFixed(2) + '%'}
+                            </Typography>
+                          </Grid>
+                          <Grid item xs={12}>
+                            <LinearProgress
+                              variant="determinate"
+                              aria-label="direct"
+                              value={(parseFloat(row.receivedamount) / parseFloat(loggedUser?.total_invested_amount)) * 100}
+                              color="primary"
+                            />
+                          </Grid>
+                        </Grid>
                       </Grid>
-                      <Grid item>
-                        <Typography variant="body2" align="right">
-                          80%
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <LinearProgress variant="determinate" aria-label="direct" value={80} color="primary" />
-                      </Grid>
-                    </Grid>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Grid container alignItems="center" spacing={1}>
-                      <Grid item sm zeroMinWidth>
-                        <Typography variant="body2">Social</Typography>
-                      </Grid>
-                      <Grid item>
-                        <Typography variant="body2" align="right">
-                          50%
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <LinearProgress variant="determinate" aria-label="Social" value={50} color="secondary" />
-                      </Grid>
-                    </Grid>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Grid container alignItems="center" spacing={1}>
-                      <Grid item sm zeroMinWidth>
-                        <Typography variant="body2">Referral</Typography>
-                      </Grid>
-                      <Grid item>
-                        <Typography variant="body2" align="right">
-                          20%
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <LinearProgress variant="determinate" aria-label="Referral" value={20} color="primary" />
-                      </Grid>
-                    </Grid>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Grid container alignItems="center" spacing={1}>
-                      <Grid item sm zeroMinWidth>
-                        <Typography variant="body2">Bounce</Typography>
-                      </Grid>
-                      <Grid item>
-                        <Typography variant="body2" align="right">
-                          60%
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <LinearProgress variant="determinate" aria-label="Bounce" value={60} color="secondary" />
-                      </Grid>
-                    </Grid>
-                  </Grid>
-                  <Grid item xs={12}>
-                    <Grid container alignItems="center" spacing={1}>
-                      <Grid item sm zeroMinWidth>
-                        <Typography variant="body2">Internet</Typography>
-                      </Grid>
-                      <Grid item>
-                        <Typography variant="body2" align="right">
-                          40%
-                        </Typography>
-                      </Grid>
-                      <Grid item xs={12}>
-                        <LinearProgress variant="determinate" aria-label="Internet" value={40} color="primary" />
-                      </Grid>
-                    </Grid>
-                  </Grid>
+                    );
+                  })}
                 </Grid>
               </CardContent>
             </Card>

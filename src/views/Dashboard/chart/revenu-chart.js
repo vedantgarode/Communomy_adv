@@ -1,6 +1,8 @@
 import value from 'assets/scss/_themes-vars.scss';
+
 // eslint-disable-next-line
 export default {
+  
   height: 228,
   type: 'donut',
   options: {
