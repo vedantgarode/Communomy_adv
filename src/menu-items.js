@@ -9,6 +9,7 @@ import ChromeReaderModeOutlinedIcon from '@mui/icons-material/ChromeReaderModeOu
 import SecurityOutlinedIcon from '@mui/icons-material/SecurityOutlined';
 import HelpOutlineOutlinedIcon from '@mui/icons-material/HelpOutlineOutlined';
 import Diversity1RoundedIcon from '@mui/icons-material/Diversity1Rounded';
+// import { useUserAuth } from 'context/UserAuthContext';
 const icons = {
   NavigationOutlinedIcon: NavigationOutlinedIcon,
   HomeOutlinedIcon: HomeOutlinedIcon,
@@ -21,6 +22,7 @@ const icons = {
   ContactSupportOutlinedIcon: ContactSupportOutlinedIcon,
   Diversity1RoundedIcon: Diversity1RoundedIcon
 };
+// const {user}=useUserAuth();
 
 // eslint-disable-next-line
 export default {
@@ -59,44 +61,6 @@ export default {
     },
 
     {
-      id: 'pages',
-      title: 'Pages',
-      caption: 'Prebuild Pages',
-      type: 'group',
-      icon: icons['NavigationOutlinedIcon'],
-      children: [
-        {
-          id: 'sample-page',
-          title: 'Sample Page',
-          type: 'item',
-          url: '/sample-page',
-          icon: icons['ChromeReaderModeOutlinedIcon']
-        },
-        {
-          id: 'auth',
-          title: 'Authentication',
-          type: 'collapse',
-          icon: icons['SecurityOutlinedIcon'],
-          children: [
-            {
-              id: 'login-1',
-              title: 'Login',
-              type: 'item',
-              url: '/application/login',
-              target: true
-            },
-            {
-              id: 'register',
-              title: 'Register',
-              type: 'item',
-              url: '/application/register',
-              target: true
-            }
-          ]
-        }
-      ]
-    },
-    {
       id: 'transactions',
       title: 'Transactions',
       type: 'group',
@@ -118,53 +82,29 @@ export default {
         }
       ]
     },
-
     {
-      id: 'auth',
-      title: 'Authentication',
-      type: 'collapse',
-      icon: icons['SecurityOutlinedIcon'],
+      id: 'master',
+      title: 'Admin Section',
+      type: 'master',
+      icon: icons['AccountTreeOutlinedIcon'],
       children: [
         {
-          id: 'login-1',
-          title: 'Login',
-          type: 'item',
-          url: '/application/login',
-          target: true
+          id: 'admin',
+          title: 'Admin Dashboard',
+          type: 'master',
+          url: '/admin-dashboard',
+          icon: icons['AppsOutlinedIcon']
         },
         {
-          id: 'register',
-          title: 'Register',
-          type: 'item',
-          url: '/application/register',
-          target: true
+          id: 'Manage',
+          title: 'Manage Assests',
+          type: 'master',
+          url: '/admin-assest',
+          icon: icons['FormatColorTextOutlinedIcon']
         }
       ]
     },
-    // {
-    //   id: 'utils',
-    //   title: 'Utils',
-    //   type: 'group',
-    //   icon: icons['AccountTreeOutlinedIcon'],
-    //   children: [
-    //     {
-    //       id: 'util-icons',
-    //       title: 'Icons',
-    //       type: 'item',
-    //       url: 'https://mui.com/material-ui/material-icons/',
-    //       icon: icons['AppsOutlinedIcon'],
-    //       external: true,
-    //       target: true
-    //     },
-    //     {
-    //       id: 'util-typography',
-    //       title: 'Typography',
-    //       type: 'item',
-    //       url: '/utils/util-typography',
-    //       icon: icons['FormatColorTextOutlinedIcon']
-    //     }
-    //   ]
-    // },
+
     {
       id: 'support',
       title: 'Support',

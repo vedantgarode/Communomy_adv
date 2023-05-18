@@ -3,12 +3,9 @@ import React from 'react';
 // material-ui
 import { useTheme } from '@mui/material/styles';
 import { Fade, Button, ClickAwayListener, Paper, Popper, List, ListItemText, ListItemIcon, ListItemButton } from '@mui/material';
-
+import { useUserAuth } from 'context/UserAuthContext';
 // assets
-import PersonTwoToneIcon from '@mui/icons-material/PersonTwoTone';
-import DraftsTwoToneIcon from '@mui/icons-material/DraftsTwoTone';
-import LockOpenTwoTone from '@mui/icons-material/LockOpenTwoTone';
-import SettingsTwoToneIcon from '@mui/icons-material/SettingsTwoTone';
+
 import AccountCircleTwoToneIcon from '@mui/icons-material/AccountCircleTwoTone';
 import MeetingRoomTwoToneIcon from '@mui/icons-material/MeetingRoomTwoTone';
 
@@ -16,13 +13,22 @@ import MeetingRoomTwoToneIcon from '@mui/icons-material/MeetingRoomTwoTone';
 
 const ProfileSection = () => {
   const theme = useTheme();
-
+  const {logOut}=useUserAuth();
   const [selectedIndex, setSelectedIndex] = React.useState(1);
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef(null);
 
-  const handleListItemClick = (event, index) => {
-    setSelectedIndex(index);
+  // const handleListItemClick = (event, index) => {
+  //   setSelectedIndex(index);
+  // };
+  const handleLogout = async (index) => {
+    try {
+      await logOut();
+      setSelectedIndex(index)
+      navigate("/login");
+    } catch (error) {
+      console.log(error.message);
+    }
   };
 
   const handleToggle = () => {
@@ -95,36 +101,12 @@ const ProfileSection = () => {
                     borderRadius: '10px'
                   }}
                 >
-                  <ListItemButton selected={selectedIndex === 0} onClick={(event) => handleListItemClick(event, 0)}>
-                    <ListItemIcon>
-                      <SettingsTwoToneIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Settings" />
-                  </ListItemButton>
-                  <ListItemButton selected={selectedIndex === 1} onClick={(event) => handleListItemClick(event, 1)}>
-                    <ListItemIcon>
-                      <PersonTwoToneIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="Profile" />
-                  </ListItemButton>
-                  <ListItemButton selected={selectedIndex === 2} onClick={(event) => handleListItemClick(event, 2)}>
-                    <ListItemIcon>
-                      <DraftsTwoToneIcon />
-                    </ListItemIcon>
-                    <ListItemText primary="My Messages" />
-                  </ListItemButton>
-                  <ListItemButton selected={selectedIndex === 3} onClick={(event) => handleListItemClick(event, 3)}>
-                    <ListItemIcon>
-                      <LockOpenTwoTone />
-                    </ListItemIcon>
-                    <ListItemText primary="Lock Screen" />
-                  </ListItemButton>
-                  <ListItemButton selected={selectedIndex === 4}>
+                  <ListItemButton selected={selectedIndex === 4} onClick={() => handleLogout(0)}>
                     <ListItemIcon>
                       <MeetingRoomTwoToneIcon />
                     </ListItemIcon>
                     <ListItemText primary="Logout" />
-                  </ListItemButton>
+                  </ListItemButton> 
                 </List>
               </ClickAwayListener>
             </Paper>

@@ -12,11 +12,13 @@ import NavItem from '../NavItem';
 import ExpandLess from '@mui/icons-material/ExpandLess';
 import ExpandMore from '@mui/icons-material/ExpandMore';
 import ArrowForwardIcon from '@mui/icons-material/ArrowForward';
+import { useUserAuth } from 'context/UserAuthContext';
 
 // ==============================|| NAV COLLAPSE ||============================== //
 
 const NavCollapse = ({ menu, level }) => {
   const theme = useTheme();
+  const {user}=useUserAuth();
   const [open, setOpen] = React.useState(false);
   const [selected, setSelected] = React.useState(null);
 
@@ -31,10 +33,13 @@ const NavCollapse = ({ menu, level }) => {
         return <NavCollapse key={item.id} menu={item} level={level + 1} />;
       case 'item':
         return <NavItem key={item.id} item={item} level={level + 1} />;
+      case user.displayName:
+          return <NavItem key={item.id} item={item} level={level + 1} />;
+
       default:
         return (
           <Typography key={item.id} variant="h6" color="error" align="center">
-            Menu Items Error
+            Menu Items Error item
           </Typography>
         );
     }

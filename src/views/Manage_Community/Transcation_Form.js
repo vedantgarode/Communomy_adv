@@ -5,42 +5,44 @@ import Grid from '@mui/material/Grid';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import { useUserAuth } from 'context/UserAuthContext';
-import { toast } from "react-toastify";
+import { toast } from 'react-toastify';
 import { transact } from '../../firebase';
 import { findUser } from '../../firebase';
-
+import { useNavigate } from 'react-router';
 
 const Transcation_Form = (props) => {
   const { handleClickClose, row } = props;
   const [amount, sentamount] = useState(0);
   const [cointype, sentcointype] = useState();
   const [TError, setTError] = useState();
+  const navigate = useNavigate();
 
-  const {user}=useUserAuth();
+  const { user } = useUserAuth();
 
   const handleSendTranscation = async (e) => {
     e.preventDefault();
-    console.log(amount)
-    if (amount < 0 || amount === 0 || amount === "" || amount === undefined || amount === null ) {
-      setTError("Enter Valid Amount !");
-      console.log("Transaction Failed !");
 
+    console.log(amount);
+    if (amount < 0 || amount === 0 || amount === '' || amount === undefined || amount === null) {
+      setTError('Enter Valid Amount !');
+      console.log('Transaction Failed !');
     } else {
       try {
         const user2 = await findUser(row);
         const sender = await findUser(user.displayName.trim().toLowerCase());
-          setTError(
-          await transact(sender.data(), user2.data(), amount, cointype)
-        ); 
-        console.log(user2.data(),sender.data())
+        setTError(await transact(sender.data(), user2.data(), amount, cointype));
+        toast.success('Please wait to Confirm Transaction');
+
+        console.log(user2.data(), sender.data());
       } catch (error) {
-        setTError("Select Valid User !");
-        console.log("Transaction Failed !", error);
-        toast.error("error")
+        setTError('Select Valid User !');
+        console.log('Transaction Failed !', error);
+        toast.error('error');
       }
     }
+    handleClickClose();
+    navigate('/send-transcations');
   };
-  
 
   //   useEffect(() => {
   //     sentamount(0);
@@ -85,11 +87,8 @@ const Transcation_Form = (props) => {
         </Grid>
       </Box>
       <Box container m={1} display="flex" justifyContent="center" alignItems="flex-end" sx={{ marginTop: 3 }}>
-        <Button onClick={handleClickClose} variant="outlined" color="success">
-          Send to {row}
-        </Button>
         <Button onClick={handleSendTranscation} variant="outlined" color="success">
-          Send to + {row}
+          Send to {row}
         </Button>
         {TError}
       </Box>

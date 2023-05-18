@@ -49,6 +49,44 @@ export const search_familiy = async (user) => {
   }
   return family;
 };
+//add kr family
+export const add_familiy = async (user1, user2, u2Name) => {
+  const DocRef = collection(
+    db,
+    "/users_search/" + user1.displayName + "/my_family"
+  );
+  const Doc2Ref = collection(
+    db,
+    "/users_search/" + user2.user_name + "/my_family"
+  );
+  const FrndRef = doc(
+    db,
+    "/users_search/" + user1.displayName + "/my_family",
+    u2Name
+  );
+  const docSnap = await getDoc(FrndRef);
+
+  if (docSnap.exists()) {
+    return "User   Friend !";
+  } else {
+    if (user1.uid === user2.BID) {
+      return "Cannot Add Yorself";
+    }
+    await setDoc(doc(DocRef, u2Name), {
+      Name: u2Name,
+      BID: user2.BID,
+      received_amount: 0,
+      sent_amount: 0,
+    });
+    await setDoc(doc(Doc2Ref, user1.displayName), {
+      Name: user1.displayName,
+      BID: user1.uid,
+      received_amount: 0,
+      sent_amount: 0,
+    });
+    return "User Added !";
+  }
+};
 
 //Make Transaction
 export const transact = async (user1, user2, amount, coin) => {
@@ -213,3 +251,4 @@ export const search_receivedtransact = async (user) => {
   }
   return transactions;
 };
+

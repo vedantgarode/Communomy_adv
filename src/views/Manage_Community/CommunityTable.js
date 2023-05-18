@@ -22,7 +22,7 @@ const CommunityTable = () => {
   };
   useEffect(() => {
     Search_familiy();
-  }, [my_friends2]);
+  }, [user]);
   console.log('SearchFa', my_friends);
 
   useEffect(() => {

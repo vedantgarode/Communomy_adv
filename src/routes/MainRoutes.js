@@ -6,7 +6,7 @@ import Loadable from 'component/Loadable';
 import { useRoutes } from 'react-router';
 import { useState } from 'react';
 import { useUserAuth } from 'context/UserAuthContext';
-
+const AdminDasboard = Loadable(lazy(() => import('../views/AdminDashboard')));
 const DashboardDefault = Loadable(lazy(() => import('../views/Dashboard')));
 const UtilsTypography = Loadable(lazy(() => import('../views/Utils/Typography')));
 const RegisterPage = Loadable(lazy(() => import('../views/Register')));
@@ -44,6 +44,14 @@ export default function MainRoutes() {
         {
           path: 'recived-transcations',
           element: <Rcvd_Transcations />
+        },
+        {
+          path: 'admin-dashboard',
+          element: user?.displayName === 'master' ? <AdminDasboard /> : <p>404</p>
+        },
+        {
+          path: 'admin-assest',
+          element: user?.displayName === 'master' ? <Send_Transcation /> : <p>404</p>
         },
         { path: '/utils/util-typography', element: <UtilsTypography /> },
         { path: '/sample-page', element: <SamplePage /> }

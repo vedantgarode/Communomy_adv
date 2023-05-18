@@ -8,23 +8,23 @@ import { List, Typography } from '@mui/material';
 // project import
 import NavItem from '../NavItem';
 import NavCollapse from '../NavCollapse';
+import { useUserAuth } from 'context/UserAuthContext';
 
 // ==============================|| NAVGROUP ||============================== //
 
 const NavGroup = ({ item }) => {
+  const {user}=useUserAuth();
+  console.log("user@dash",user)
   const theme = useTheme();
+   
   const items = item.children.map((menu) => {
     switch (menu.type) {
       case 'collapse':
         return <NavCollapse key={menu.id} menu={menu} level={1} />;
       case 'item':
-        return <NavItem key={menu.id} item={menu} level={1} />;
-      default:
-        return (
-          <Typography key={menu.id} variant="h6" color="error" align="center">
-            Menu Items Error
-          </Typography>
-        );
+        return <NavItem key={menu.id} item={menu} level={1} />;  
+      case user.displayName:
+          return <NavItem key={menu.id} item={menu} level={1} />; 
     }
   });
 
