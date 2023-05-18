@@ -19,7 +19,7 @@ import MonetizationOnTwoTone from '@mui/icons-material/MonetizationOnTwoTone';
 import ThumbUpAltTwoTone from '@mui/icons-material/ThumbUpAltTwoTone';
 import Diversity1TwoToneIcon from '@mui/icons-material/Diversity1TwoTone';
 //firebaseimport
-import { findUser } from '../../../src/firebase';
+import { findUser} from '../../../src/firebase';
 import { useUserAuth } from 'context/UserAuthContext';
 import { search_familiy } from '../../../src/firebase';
 // custom style
@@ -61,8 +61,8 @@ const Default = () => {
 
   const my_info = async () => {
     try {
-      if (user && user.displayName) {
-        setloggedUser((await findUser(user.displayName))?.data());
+      if (user && user.displayName) {        
+        setloggedUser((await findUser("master"))?.data());
       }
     } catch (error) {
       console.log('No user Found !', error);
@@ -80,7 +80,7 @@ const Default = () => {
         <Grid container spacing={gridSpacing}>
           <Grid item lg={3} sm={6} xs={12}>
             <ReportCard
-              primary={parseFloat(loggedUser?.total_invested_amount).toFixed(7) + '~'}
+              primary={parseFloat(loggedUser?.total_money).toFixed(7) + '~'}
               secondary="Invested Amount"
               color={theme.palette.warning.main}
               footerData="Investments"
@@ -90,7 +90,7 @@ const Default = () => {
           </Grid>
           <Grid item lg={3} sm={6} xs={12}>
             <ReportCard
-              primary={(parseFloat(loggedUser?.total_invested_amount) * 1.04).toFixed(7) + '~'}
+              primary={(parseFloat(loggedUser?.total_transaction) * 1.04).toFixed(7) + '~'}
               secondary="Expected Returns"
               color={theme.palette.success.main}
               footerData="Expected Returns YoY"
@@ -100,7 +100,7 @@ const Default = () => {
           </Grid>
           <Grid item lg={3} sm={6} xs={12}>
             <ReportCard
-              primary={loggedUser?.total_received_amount}
+              primary={loggedUser?.total_member}
               secondary="Total Recived"
               color={theme.palette.primary.main}
               footerData="Total Amount Recived"

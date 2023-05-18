@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import MUIDataTable from 'mui-datatables';
 import { Box } from '@mui/material';
 //firebase
-import { search_familiy } from '../../../src/firebase';
+import { search_familiy} from '../../../src/firebase';
 import { useUserAuth } from 'context/UserAuthContext';
 import SendTranscation from './sendTranscation';
 
@@ -16,6 +16,7 @@ const CommunityTable = () => {
   const Search_familiy = async () => {
     try {
       SearchFriend(await search_familiy(user));
+      //SearchFriend(await search_all_user(user));
     } catch (error) {
       console.log('Friend Searching Failed !');
     }

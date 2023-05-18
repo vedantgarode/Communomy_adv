@@ -80,7 +80,7 @@ const Default = () => {
         <Grid container spacing={gridSpacing}>
           <Grid item lg={3} sm={6} xs={12}>
             <ReportCard
-              primary={parseFloat(loggedUser?.total_invested_amount).toFixed(7) + '~'}
+              primary={loggedUser.user_name==="master"?parseFloat(loggedUser?.total_money).toFixed(7) + '~':parseFloat(loggedUser?.total_invested_amount).toFixed(7) + '~'}
               secondary="Invested Amount"
               color={theme.palette.warning.main}
               footerData="Investments"

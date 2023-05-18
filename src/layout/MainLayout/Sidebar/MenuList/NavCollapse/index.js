@@ -29,7 +29,7 @@ const NavCollapse = ({ menu, level }) => {
 
   const menus = menu.children.map((item) => {
     switch (item.type) {
-      case 'collapse':
+      case 'collapse' :
         return <NavCollapse key={item.id} menu={item} level={level + 1} />;
       case 'item':
         return <NavItem key={item.id} item={item} level={level + 1} />;

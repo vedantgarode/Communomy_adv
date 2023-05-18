@@ -14,6 +14,9 @@ export const app = initializeApp(firebaseConfig);
 export const auth = getAuth();
 export const db = getFirestore(app);
 
+
+
+
 //Code For Finding User
 export const findUser = async (user_name) => {
   const docRef = doc(db, '/users_search', user_name);
@@ -24,6 +27,28 @@ export const findUser = async (user_name) => {
     console.log('No such document!');
     return false;
   }
+};
+
+//All users Array
+export const search_all_user = async () => {
+  let family = [];
+  try {
+    const querySnapshot = await getDocs(collection(db, '/users_search'));
+    console.log(querySnapshot);
+    querySnapshot.forEach((doc) => {
+      const person = {
+        name: doc.data().user_name,
+        bid: doc.data().BID,
+        receivedamount: doc.data().total_received_amount
+      };
+      family.push(person);
+      console.log("All USer :" ,family);
+      console.log(person);
+    });
+  } catch (e) {
+    console.log(e);
+  }
+  return family;
 };
 
 //Family Community Friends
@@ -51,40 +76,30 @@ export const search_familiy = async (user) => {
 };
 //add kr family
 export const add_familiy = async (user1, user2, u2Name) => {
-  const DocRef = collection(
-    db,
-    "/users_search/" + user1.displayName + "/my_family"
-  );
-  const Doc2Ref = collection(
-    db,
-    "/users_search/" + user2.user_name + "/my_family"
-  );
-  const FrndRef = doc(
-    db,
-    "/users_search/" + user1.displayName + "/my_family",
-    u2Name
-  );
+  const DocRef = collection(db, '/users_search/' + user1.displayName + '/my_family');
+  const Doc2Ref = collection(db, '/users_search/' + user2.user_name + '/my_family');
+  const FrndRef = doc(db, '/users_search/' + user1.displayName + '/my_family', u2Name);
   const docSnap = await getDoc(FrndRef);
 
   if (docSnap.exists()) {
-    return "User   Friend !";
+    return 'User   Friend !';
   } else {
     if (user1.uid === user2.BID) {
-      return "Cannot Add Yorself";
+      return 'Cannot Add Yorself';
     }
     await setDoc(doc(DocRef, u2Name), {
       Name: u2Name,
       BID: user2.BID,
       received_amount: 0,
-      sent_amount: 0,
+      sent_amount: 0
     });
     await setDoc(doc(Doc2Ref, user1.displayName), {
       Name: user1.displayName,
       BID: user1.uid,
       received_amount: 0,
-      sent_amount: 0,
+      sent_amount: 0
     });
-    return "User Added !";
+    return 'User Added !';
   }
 };
 
@@ -157,8 +172,13 @@ export const transact = async (user1, user2, amount, coin) => {
     } else {
       const returnfamilyRef = doc(db, '/users_search/' + user2.user_name + '/my_family', user1.user_name);
       const returnfamilySnap = await getDoc(returnfamilyRef);
-
       const user2Ref = collection(db, '/pending_transact');
+      
+      //Admin referance 
+      const adminref = doc(db, '/users_search/master');
+      const adminSnap = await getDoc(adminref);
+      
+      
       const myRef = doc(db, '/users_search', user1.user_name);
       const receiverRef = doc(db, '/users_search', user2.user_name);
 
@@ -166,6 +186,17 @@ export const transact = async (user1, user2, amount, coin) => {
       let sendercurrAmount = user1.total_invested_amount;
       let receivercurrAmount = user2.total_received_amount;
       let frndreceivedAmount = familySnap.data().received_amount;
+
+      //Admin initial Values 
+      let adminTotal = adminSnap.data().total_money;
+      let adminTransaction = adminSnap.data().total_transaction;
+     console.log("Total amount" , adminTotal)
+     console.log("Total transact" , adminTransaction)
+
+      await updateDoc(adminref, {
+        total_money: parseFloat(adminTotal) + parseFloat(amount),
+        total_transaction: parseFloat(adminTransaction) + parseFloat(1),
+      });
 
       await updateDoc(returnfamilyRef, {
         sent_amount: parseFloat(returnfamilyamount) + parseFloat(amount)
@@ -183,8 +214,10 @@ export const transact = async (user1, user2, amount, coin) => {
       await setDoc(doc(user2Ref), {
         Transaction_ID: result,
         Transaction_Time: new Date(),
+        Sender : user1.user_name,
         Sender_BID: user1.BID,
         Sender_metamask: user1.metamask,
+        Receiver : user2.user_name,
         Receiver_BID: user2.BID,
         Reciver_metamask: user2.metamask,
         Coin_Type: coin,
@@ -197,7 +230,7 @@ export const transact = async (user1, user2, amount, coin) => {
     return 'Database Error !' + error;
   }
 };
-                     //Transcations
+//Transcations
 //Sent Trancation
 export const search_senttransact = async (user) => {
   let transactions = [];
@@ -228,11 +261,7 @@ export const search_receivedtransact = async (user) => {
   let transactions = [];
   try {
     console.log(user.data().BID);
-    const q = query(
-      collection(db, "pending_transact"),
-      where("Receiver_BID", "==", user.data().BID),
-      orderBy("Transaction_Time", "desc")
-    );
+    const q = query(collection(db, 'pending_transact'), where('Receiver_BID', '==', user.data().BID), orderBy('Transaction_Time', 'desc'));
     const querySnapshot = await getDocs(q);
     //console.log(querySnapshot)
     querySnapshot.forEach((doc) => {
@@ -242,7 +271,7 @@ export const search_receivedtransact = async (user) => {
         receiver: doc.data().Receiver_BID,
         time: new Date(doc.data().Transaction_Time.seconds * 1000).toString(),
         amount: doc.data().Value,
-        transaction_id: doc.data().Transaction_ID,
+        transaction_id: doc.data().Transaction_ID
       };
       transactions.push(transaction);
     });
@@ -251,4 +280,3 @@ export const search_receivedtransact = async (user) => {
   }
   return transactions;
 };
-
