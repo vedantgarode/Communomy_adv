@@ -36,7 +36,7 @@ const RevenuChartCard = ({totat_inv,totat_rcv,totat_ecp }) => {
       colors: [value.warning,value.success,value.primary]
     
   }
-  console.log(typeof(totat_inv),totat_rcv,"totat_inv")
+  console.log("data",totat_inv,totat_rcv,"totat_inv")
   let data =[parseFloat(totat_inv),parseFloat(totat_ecp),parseFloat(totat_rcv)]
 
   

@@ -21,7 +21,7 @@ import Diversity1TwoToneIcon from '@mui/icons-material/Diversity1TwoTone';
 //firebaseimport
 import { findUser } from '../../../src/firebase';
 import { useUserAuth } from 'context/UserAuthContext';
-import { search_familiy } from '../../../src/firebase';
+import { search_familiy, search_all_user } from '../../../src/firebase';
 // custom style
 
 const FlatCardBlock = styled((props) => <Grid item sm={6} xs={12} {...props} />)(({ theme }) => ({
@@ -43,6 +43,8 @@ const Default = () => {
   const { user } = useUserAuth();
   const [loggedUser, setloggedUser] = useState([]);
   const [my_friends, SearchFriend] = useState([]);
+  const [all_friends, SearchFriends] = useState([]);
+
   const Search_familiy = async () => {
     try {
       SearchFriend(await search_familiy(user));
@@ -52,6 +54,19 @@ const Default = () => {
   };
   useEffect(() => {
     Search_familiy();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+  const All_familiy = async () => {
+    try {
+      if (user.displayName === 'master') {
+        SearchFriends(await search_all_user(user));
+      }
+    } catch (error) {
+      console.log('Friend Searching Failed !');
+    }
+  };
+  useEffect(() => {
+    All_familiy();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
   console.log('Das', my_friends.length);
@@ -80,17 +95,25 @@ const Default = () => {
         <Grid container spacing={gridSpacing}>
           <Grid item lg={3} sm={6} xs={12}>
             <ReportCard
-              primary={loggedUser.user_name==="master"?parseFloat(loggedUser?.total_money).toFixed(7) + '~':parseFloat(loggedUser?.total_invested_amount).toFixed(7) + '~'}
+              primary={
+                loggedUser.user_name === 'master'
+                  ? parseFloat(loggedUser?.total_money).toFixed(6) + '~'
+                  : parseFloat(loggedUser?.total_invested_amount).toFixed(6) + '~'
+              }
               secondary="Invested Amount"
               color={theme.palette.warning.main}
-              footerData="Investments"
+              footerData={loggedUser.user_name === 'master' ? 'Total Invested' : 'Invesments'}
               iconPrimary={MonetizationOnTwoTone}
               // iconFooter={TrendingUpIcon}
             />
           </Grid>
           <Grid item lg={3} sm={6} xs={12}>
             <ReportCard
-              primary={(parseFloat(loggedUser?.total_invested_amount) * 1.04).toFixed(7) + '~'}
+              primary={
+                loggedUser.user_name === 'master'
+                  ? (parseFloat(loggedUser?.total_money) * 1.04).toFixed(6) + '~'
+                  : +(parseFloat(loggedUser?.total_invested_amount) * 1.04).toFixed(6) + '~'
+              }
               secondary="Expected Returns"
               color={theme.palette.success.main}
               footerData="Expected Returns YoY"
@@ -100,20 +123,25 @@ const Default = () => {
           </Grid>
           <Grid item lg={3} sm={6} xs={12}>
             <ReportCard
-              primary={loggedUser?.total_received_amount}
-              secondary="Total Recived"
+              primary={
+                loggedUser.user_name === 'master'
+                  ? parseFloat(loggedUser?.total_transaction)
+                  : parseFloat(loggedUser?.total_invested_amount).toFixed(6) + '~'
+              }
+              // primary={loggedUser?.total_received_amount}
+              secondary={loggedUser.user_name === 'master' ? 'Transcations' : 'Amount Recived'}
               color={theme.palette.primary.main}
-              footerData="Total Amount Recived"
+              footerData={loggedUser.user_name === 'master' ? 'Total Transcations' : 'Total Amount Recived'}
               iconPrimary={ThumbUpAltTwoTone}
               // iconFooter={TrendingUpIcon}
             />
           </Grid>
           <Grid item lg={3} sm={6} xs={12}>
             <ReportCard
-              primary={my_friends?.length}
+              primary={loggedUser.user_name === 'master' ? all_friends?.length : my_friends?.length}
               secondary="Members"
               color={theme.palette.error.main}
-              footerData="People in Your Community"
+              footerData={loggedUser.user_name ? 'People in Communomy' : 'People in Your Community'}
               iconPrimary={Diversity1TwoToneIcon}
               // iconFooter={TrendingUpIcon}
             />
@@ -185,9 +213,21 @@ const Default = () => {
               <Grid item xs={12} sm={6}>
                 <RevenuChartCard
                   chartData={RevenuChartCardData}
-                  totat_inv={parseFloat(loggedUser?.total_invested_amount).toFixed(7)}
-                  totat_rcv={parseFloat(loggedUser?.total_received_amount).toFixed(7)}
-                  totat_ecp={(parseFloat(loggedUser?.total_invested_amount) * 1.04).toFixed(7)}
+                  totat_inv={
+                    loggedUser.user_name === 'master'
+                      ? parseFloat(loggedUser?.total_money)
+                      : parseFloat(loggedUser?.total_invested_amount).toFixed(7)
+                  }
+                  totat_rcv={
+                    loggedUser.user_name === 'master'
+                      ? parseFloat(loggedUser?.total_transaction)
+                      : parseFloat(loggedUser?.total_received_amount).toFixed(7)
+                  }
+                  totat_ecp={
+                    loggedUser.user_name === 'master'
+                      ? (parseFloat(loggedUser?.total_money) * 1.04).toFixed(7)
+                      : (parseFloat(loggedUser?.total_invested_amount) * 1.04).toFixed(7)
+                  }
                 />
               </Grid>
             </Grid>
@@ -204,6 +244,36 @@ const Default = () => {
               <Divider />
               <CardContent>
                 <Grid container spacing={gridSpacing}>
+                  {console.log("alldosy",all_friends)}
+                  {all_friends?.map((row) => {
+                    if (row.name !== 'master') {
+                      return (
+                        <Grid item xs={12} key={row.name}>
+                          <Grid container alignItems="center" spacing={1}>
+                            <Grid item sm zeroMinWidth>
+                              <Typography variant="body2">{row?.name}</Typography>
+                            </Grid>
+                            <Grid item>
+                              <Typography variant="body2" align="right">
+                                {parseFloat(
+                                  (parseFloat(row.receivedamount).toFixed(7) / parseFloat(loggedUser?.total_money).toFixed(7)) *
+                                    100
+                                ).toFixed(2) + '%'}
+                              </Typography>
+                            </Grid>
+                            <Grid item xs={12}>
+                              <LinearProgress
+                                variant="determinate"
+                                aria-label="direct"
+                                value={(parseFloat(row.receivedamount) / parseFloat(loggedUser?.total_money)) * 100}
+                                color="primary"
+                              />
+                            </Grid>
+                          </Grid>
+                        </Grid>
+                      );
+                    }
+                  })}
                   {my_friends?.map((row) => {
                     return (
                       <Grid item xs={12} key={row.name}>
