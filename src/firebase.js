@@ -1,5 +1,6 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
+// import { ethers } from "ethers";
 import { doc, getFirestore, getDoc, getDocs, collection, updateDoc, setDoc, where, query, orderBy } from 'firebase/firestore';
 const firebaseConfig = {
   apiKey: 'AIzaSyDz2MWbf5xqGdvjbVLgJD0vHK4l7qq18IM',
@@ -14,8 +15,11 @@ export const app = initializeApp(firebaseConfig);
 export const auth = getAuth();
 export const db = getFirestore(app);
 
-
-
+// export const compound_account = async () => {
+//   const comet = new ethers.Contract(contractAddress, abiJson, provider);
+//   //const [ principal, baseTrackingIndex, baseTrackingAccrued, assetsIn ] = await comet.callStatic.userBasic('0x9255153815a9948d44e6F121A11deD4b4823a3d9');
+//   console.log(comet);
+// };
 
 //Code For Finding User
 export const findUser = async (user_name) => {

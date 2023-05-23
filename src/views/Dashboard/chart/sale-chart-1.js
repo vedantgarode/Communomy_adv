@@ -17,8 +17,8 @@ const chartData = {
       width: 3
     },
     yaxis: {
-      min: 20,
-      max: 100
+      min: 0,
+      max: 10
     },
     tooltip: {
       theme: 'dark',
@@ -30,18 +30,18 @@ const chartData = {
       },
       y: {
         title: {
-          formatter: () => 'Sales/Order Per Day'
+          formatter: () => 'APR per Day'
         }
       },
       marker: {
-        show: false
+        show: true
       }
     }
   },
   series: [
     {
-      name: 'series1',
-      data: [55, 35, 75, 25, 90, 50]
+      name: 'APRs',
+      data: [4.3, 3.5, 2.5, 2.2, 3.0, 5.0 ,1.6,4.3, 3.5, 2.5, 2.2, 3.0, 5.0 ,1.6]
     }
   ]
 };

@@ -30,7 +30,7 @@ export default {
     {
       id: 'navigation',
       title: 'Communomy',
-      caption: 'Dashboard',
+      caption: 'Manage Your Assets',
       type: 'group',
       icon: icons['NavigationOutlinedIcon'],
       children: [
@@ -64,18 +64,19 @@ export default {
       id: 'transactions',
       title: 'Transactions',
       type: 'group',
+      caption: 'View Transaction',
       icon: icons['AccountTreeOutlinedIcon'],
       children: [
         {
           id: 'sendtnx',
-          title: 'Send Transaction',
+          title: 'Sent Transaction',
           type: 'item',
           url: '/send-transcations',
-          icon: icons['AppsOutlinedIcon']
+          icon: icons['FormatColorTextOutlinedIcon']
         },
         {
           id: 'rcvdtnx',
-          title: 'Recived Transcations',
+          title: 'Received Transcations',
           type: 'item',
           url: '/recived-transcations',
           icon: icons['FormatColorTextOutlinedIcon']
@@ -108,30 +109,19 @@ export default {
     {
       id: 'support',
       title: 'Support',
+      caption: 'Contact Support',
       type: 'group',
       icon: icons['ContactSupportOutlinedIcon'],
       children: [
         {
-          id: 'disabled-menu',
-          title: 'Disabled Menu',
+          id: 'contact_menu',
+          title: 'Contact Us',
           type: 'item',
           url: '#',
-          icon: icons['BlockOutlinedIcon'],
-          disabled: true
+          icon: icons['ContactSupportOutlinedIcon'],
+          
         },
-        {
-          id: 'documentation',
-          title: 'Documentation',
-          type: 'item',
-          url: 'https://codedthemes.gitbook.io/materially-react-material-documentation/',
-          icon: icons['HelpOutlineOutlinedIcon'],
-          chip: {
-            label: 'Help?',
-            color: 'primary'
-          },
-          external: true,
-          target: true
-        }
+        
       ]
     }
   ]

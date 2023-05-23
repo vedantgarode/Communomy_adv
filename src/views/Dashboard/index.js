@@ -2,11 +2,14 @@ import React, { useEffect } from 'react';
 import { useState } from 'react';
 // material-ui
 import { useTheme, styled } from '@mui/material/styles';
-import { Grid, Card, CardHeader, CardContent, Typography, Divider, LinearProgress } from '@mui/material';
+import { Grid, Card, CardHeader, CardContent, Typography, Divider, LinearProgress ,Button} from '@mui/material';
 
 //project import
 import SalesLineCard from './SalesLineCard';
 import SalesLineCardData from './chart/sale-chart-1';
+
+//Ether 
+import { ethers } from "ethers";
 
 import RevenuChartCard from './RevenuChartCard';
 import RevenuChartCardData from './chart/revenu-chart';
@@ -41,9 +44,17 @@ const FlatCardBlock = styled((props) => <Grid item sm={6} xs={12} {...props} />)
 const Default = () => {
   const theme = useTheme();
   const { user } = useUserAuth();
-  const [loggedUser, setloggedUser] = useState([]);
+  const [loggedUser, setloggedUser] = useState([])  ;
   const [my_friends, SearchFriend] = useState([]);
   const [all_friends, SearchFriends] = useState([]);
+  
+  const bt1 = async () => {
+    
+    // const provider = new ethers.providers.Web3Provider(window.ethereum);
+    // const comet = new ethers.Contract(contractAddress, abiJson, provider);
+    // //const [ principal, baseTrackingIndex, baseTrackingAccrued, assetsIn ] = await comet.callStatic.userBasic('0xAccount');
+    console.log(ethers);
+  };
 
   const Search_familiy = async () => {
     try {
@@ -91,9 +102,12 @@ const Default = () => {
   console.log('loff', loggedUser, user.displayName);
   return (
     <Grid container spacing={gridSpacing}>
+          <Button onClick={bt1} >BUT1</Button>
+
       <Grid item xs={12}>
         <Grid container spacing={gridSpacing}>
           <Grid item lg={3} sm={6} xs={12}>
+
             <ReportCard
               primary={
                 loggedUser.user_name === 'master'
@@ -126,7 +140,7 @@ const Default = () => {
               primary={
                 loggedUser.user_name === 'master'
                   ? parseFloat(loggedUser?.total_transaction)
-                  : parseFloat(loggedUser?.total_invested_amount).toFixed(6) + '~'
+                  : parseFloat(loggedUser?.total_received_amount).toFixed(6) + '~'
               }
               // primary={loggedUser?.total_received_amount}
               secondary={loggedUser.user_name === 'master' ? 'Transcations' : 'Amount Recived'}
@@ -158,15 +172,15 @@ const Default = () => {
                     <SalesLineCard
                       chartData={SalesLineCardData}
                       title="Total Assets"
-                      percentage="3%"
+                      percentage="3% "
                       icon={<TrendingDownIcon />}
                       footerData={[
                         {
-                          value: '$4230',
+                          value: loggedUser?.total_received_amount,
                           label: 'Total Asset'
                         },
                         {
-                          value: '321',
+                          value: (parseFloat(loggedUser?.total_received_amount) * 1.04).toFixed(6) + '~',
                           label: 'Expected Return'
                         }
                       ]}
