@@ -4,18 +4,17 @@ import { useState, useEffect } from 'react';
 import MUIDataTable from 'mui-datatables';
 import { Box } from '@mui/material';
 //firebase
-import { search_familiy} from '../../../src/firebase';
+import { search_all_user } from '../../../src/firebase';
 import { useUserAuth } from 'context/UserAuthContext';
-import SendTranscation from './sendTranscation';
-
-const CommunityTable = () => {
+import AdminSendTranscation from './AdminSendTranscation';
+const AdminCommunityTable = () => {
   const { user } = useUserAuth();
   const [my_friends, SearchFriend] = useState([]);
   const [my_friends2, SearchFriend2] = useState([]);
 
   const Search_familiy = async () => {
     try {
-      SearchFriend(await search_familiy(user));
+      SearchFriend(await search_all_user(user));
       //SearchFriend(await search_all_user(user));
     } catch (error) {
       console.log('Friend Searching Failed !');
@@ -27,14 +26,16 @@ const CommunityTable = () => {
   console.log('SearchFa', my_friends);
 
   useEffect(() => {
-    const data = my_friends?.map((row) => {
-      return {
-        name: row.name,
-        receive: row.receivedamount,
-        sent: row.sentamount,
-        send: row.name
-      };
-    });
+    const data = my_friends
+      ?.filter((row) => row.name !== 'master')
+      .map((row) => {
+        return {
+          name: row.name,
+          receive: row.receivedamount,
+          sent: row.receivedamount * 1.04,
+          send: row.receivedamount * 1.04
+        };
+      });
     SearchFriend2(data);
   }, [my_friends]);
 
@@ -72,7 +73,7 @@ const CommunityTable = () => {
           return (
             <>
               <Box textAlign="center" display="flex">
-                <SendTranscation row={value} />
+                <AdminSendTranscation row={value} />
               </Box>
             </>
           );
@@ -87,9 +88,9 @@ const CommunityTable = () => {
   };
   return (
     <div style={{ boxSizing: 'content-box' }}>
-      <MUIDataTable title={"Member"} data={my_friends2} columns={columns} options={options} />
+      <MUIDataTable title={'Communomy Admin'} data={my_friends2} columns={columns} options={options} />
     </div>
   );
 };
 
-export default CommunityTable;
+export default AdminCommunityTable;

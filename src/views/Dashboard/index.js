@@ -9,7 +9,7 @@ import SalesLineCard from './SalesLineCard';
 import SalesLineCardData from './chart/sale-chart-1';
 
 //Ether 
-import { ethers } from "ethers";
+// import { ethers } from "ethers";
 
 import RevenuChartCard from './RevenuChartCard';
 import RevenuChartCardData from './chart/revenu-chart';

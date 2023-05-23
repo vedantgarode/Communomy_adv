@@ -8,10 +8,12 @@ import { Card, CardHeader, CardContent, Divider, Grid, Typography, Box } from '@
 import Breadcrumb from 'component/Breadcrumb';
 import CommunityTable from './CommunityTable';
 import Member from './Member';
-
+import { useUserAuth } from 'context/UserAuthContext';
+import AdminCommunityTable from './AdminCommunomyTable';
 // ==============================|| SAMPLE PAGE ||============================== //
 
 const Manage_Community = () => {
+  const { user } = useUserAuth();
   return (
     <>
       <Breadcrumb title="Manage Your Community">
@@ -23,38 +25,60 @@ const Manage_Community = () => {
           </Typography> */}
       </Breadcrumb>
       <Grid container spacing="2">
-        <Grid item xs={12} lg={8} sm={8} md={8} sx={{ p: 1 }}>
-          <Card>
-            <CardHeader
-              title={
-                <Typography component="div" className="card-header">
-                  Community
-                </Typography>
-              }
-            />
-            <Divider />
-            <CardContent>
-              <CommunityTable />
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid item xs={12} lg={4} sm={4} md={4} sx={{ p: 1 }}>
-          <Card>
-            <CardHeader
-              title={
-                <Typography component="div" className="card-header">
-                  Add Member
-                </Typography>
-              }
-            />
-            <Divider />
-            <CardContent>
-              <Box>
-                <Member />
-              </Box>
-            </CardContent>
-          </Card>
-        </Grid>
+        {user.displayName !== 'master' && (
+          <Grid item xs={12} lg={8} sm={8} md={8} sx={{ p: 1 }}>
+            <Card>
+              <CardHeader
+                title={
+                  <Typography component="div" className="card-header">
+                    Community
+                  </Typography>
+                }
+              />
+              <Divider />
+              <CardContent>
+                <CommunityTable />
+              </CardContent>
+            </Card>
+          </Grid>
+        )}
+        {user.displayName === "master" && (
+          <Grid item xs={12} lg={12} sm={12} md={12} sx={{ p: 1 }}>
+            <Card>
+              <CardHeader
+                title={
+                  <Typography component="div" className="card-header">
+                    Community
+                  </Typography>
+                }
+              />
+              <Divider />
+              <CardContent>
+                <AdminCommunityTable />
+              </CardContent>
+            </Card>
+          </Grid>
+        )}
+
+        {user?.displayName !== 'master' && (
+          <Grid item xs={12} lg={4} sm={4} md={4} sx={{ p: 1 }}>
+            <Card>
+              <CardHeader
+                title={
+                  <Typography component="div" className="card-header">
+                    Add Member
+                  </Typography>
+                }
+              />
+              <Divider />
+              <CardContent>
+                <Box>
+                  <Member />
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+        )}
       </Grid>
     </>
   );
