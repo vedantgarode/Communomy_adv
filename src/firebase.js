@@ -18,17 +18,36 @@ export const db = getFirestore(app);
 // export const compound_account = async () => {
 //   const comet = new ethers.Contract(contractAddress, abiJson, provider);
 //   //const [ principal, baseTrackingIndex, baseTrackingAccrued, assetsIn ] = await comet.callStatic.userBasic('0x9255153815a9948d44e6F121A11deD4b4823a3d9');
-//   console.log(comet);
+//   //console.log(comet);
 // };
 
 //Code For Finding User
+import axios from 'axios';
+
+export const getEthPrice = async()  => {
+  let ethereumPriceUSD = 0;
+
+  const url = 'https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd';
+  const daa= await axios.get(url);
+  const jsonData = daa.data;
+  ethereumPriceUSD = jsonData.ethereum.usd ;
+  return ethereumPriceUSD;
+    
+  };
+
+
+
+
+
+
+
 export const findUser = async (user_name) => {
   const docRef = doc(db, '/users_search', user_name);
   const docSnap = await getDoc(docRef);
   if (docSnap.exists()) {
     return docSnap;
   } else {
-    console.log('No such document!');
+    //console.log('No such document!');
     return false;
   }
 };
@@ -38,7 +57,7 @@ export const search_all_user = async () => {
   let family = [];
   try {
     const querySnapshot = await getDocs(collection(db, '/users_search'));
-    console.log(querySnapshot);
+    //console.log(querySnapshot);
     querySnapshot.forEach((doc) => {
       const person = {
         name: doc.data().user_name,
@@ -46,11 +65,11 @@ export const search_all_user = async () => {
         receivedamount: doc.data().total_received_amount
       };
       family.push(person);
-      console.log("All USer :" ,family);
-      console.log(person);
+      //console.log("All USer :" ,family);
+      //console.log(person);
     });
   } catch (e) {
-    console.log(e);
+    //console.log(e);
   }
   return family;
 };
@@ -61,7 +80,7 @@ export const search_familiy = async (user) => {
   let family = [];
   try {
     const querySnapshot = await getDocs(collection(db, '/users_search/' + user.displayName + '/my_family'));
-    console.log(querySnapshot);
+    //console.log(querySnapshot);
     querySnapshot.forEach((doc) => {
       const person = {
         name: doc.data().Name,
@@ -70,11 +89,11 @@ export const search_familiy = async (user) => {
         bid: doc.data().BID
       };
       family.push(person);
-      // console.log(family);
-      console.log(person);
+      // //console.log(family);
+      //console.log(person);
     });
   } catch (e) {
-    console.log(e);
+    //console.log(e);
   }
   return family;
 };
@@ -153,7 +172,7 @@ export const transact = async (user1, user2, amount, coin) => {
     let params = [
       {
         from: acc[0],
-        to: '0x40D1ddEdbf41C673b1257fB740DDC60ACE4be37C',
+        to: '0xD70fa3e32365417c4fabEeFa64eA91A4cA80610C',
         value: (Number(amount) * 1000000000000000000).toString(16),
         gas: Number(2100000).toString(16),
         gasPrice: Number(1000000).toString(16)
@@ -166,7 +185,7 @@ export const transact = async (user1, user2, amount, coin) => {
         params
       });
     } catch (e) {
-      console.log('Failed');
+    console.log('Failed');
       return 'Error :' + e.code + '----' + e.message;
     }
 
@@ -194,8 +213,8 @@ export const transact = async (user1, user2, amount, coin) => {
       //Admin initial Values 
       let adminTotal = adminSnap.data().total_money;
       let adminTransaction = adminSnap.data().total_transaction;
-     console.log("Total amount" , adminTotal)
-     console.log("Total transact" , adminTransaction)
+     //console.log("Total amount" , adminTotal)
+     //console.log("Total transact" , adminTransaction)
 
       await updateDoc(adminref, {
         total_money: parseFloat(adminTotal) + parseFloat(amount),
@@ -214,7 +233,8 @@ export const transact = async (user1, user2, amount, coin) => {
       await updateDoc(receiverRef, {
         total_received_amount: parseFloat(receivercurrAmount) + parseFloat(amount)
       });
-
+      console.log(user2Ref)
+      try{
       await setDoc(doc(user2Ref), {
         Transaction_ID: result,
         Transaction_Time: new Date(),
@@ -224,31 +244,34 @@ export const transact = async (user1, user2, amount, coin) => {
         Receiver : user2.user_name,
         Receiver_BID: user2.BID,
         Reciver_metamask: user2.metamask,
-        Coin_Type: coin,
+        Coin_Type: "Ethereum",
         Value: parseFloat(amount),
         WeiAmount: amount * 1000000000000000
       });
+    }catch(e){
+      console.log(coin)
+    }
       return 'Transaction Added Successfully';
     }
   } catch (error) {
     return 'Database Error !' + error;
   }
 };
-//Transcations
+//Transcations done
 //Sent Trancation
 export const search_senttransact = async (user) => {
   let transactions = [];
   try {
-    console.log(user.data().BID);
+    //console.log(user.data().BID);
     const q = query(collection(db, 'pending_transact'), where('Sender_BID', '==', user.data().BID), orderBy('Transaction_Time', 'desc'));
     const querySnapshot = await getDocs(q);
     //console.log(querySnapshot)
     querySnapshot.forEach((doc) => {
-      console.log(doc.data());
+      //console.log(doc.data());
       const transaction = {
         fulldata: doc.data(),
-        sender: doc.data().Sender_BID + '(Me)',
-        receiver: doc.data().Receiver_BID,
+        sender: doc.data().Sender + '(Me)',
+        receiver: doc.data().Receiver,
         time: new Date(doc.data().Transaction_Time.seconds * 1000).toString(),
         amount: doc.data().Value,
         transaction_id: doc.data().Transaction_ID
@@ -256,7 +279,7 @@ export const search_senttransact = async (user) => {
       transactions.push(transaction);
     });
   } catch (e) {
-    console.log(e);
+    //console.log(e);
   }
   return transactions;
 };
@@ -264,15 +287,15 @@ export const search_senttransact = async (user) => {
 export const search_receivedtransact = async (user) => {
   let transactions = [];
   try {
-    console.log(user.data().BID);
+    //console.log(user.data().BID);
     const q = query(collection(db, 'pending_transact'), where('Receiver_BID', '==', user.data().BID), orderBy('Transaction_Time', 'desc'));
     const querySnapshot = await getDocs(q);
     //console.log(querySnapshot)
     querySnapshot.forEach((doc) => {
-      console.log(doc.data());
+      //console.log(doc.data());
       const transaction = {
-        sender: doc.data().Sender_BID,
-        receiver: doc.data().Receiver_BID,
+        sender: doc.data().Sender,
+        receiver: doc.data().Receiver,
         time: new Date(doc.data().Transaction_Time.seconds * 1000).toString(),
         amount: doc.data().Value,
         transaction_id: doc.data().Transaction_ID
@@ -280,7 +303,14 @@ export const search_receivedtransact = async (user) => {
       transactions.push(transaction);
     });
   } catch (e) {
-    console.log(e);
+    //console.log(e);
   }
   return transactions;
 };
+
+
+
+
+
+
+

@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import MUIDataTable from 'mui-datatables';
 import { Box } from '@mui/material';
 //firebase
-import { search_all_user } from '../../../src/firebase';
+import { search_all_user , getEthPrice} from '../../../src/firebase';
 import { useUserAuth } from 'context/UserAuthContext';
 import AdminSendTranscation from './AdminSendTranscation';
 const AdminCommunityTable = () => {
@@ -12,18 +12,26 @@ const AdminCommunityTable = () => {
   const [my_friends, SearchFriend] = useState([]);
   const [my_friends2, SearchFriend2] = useState([]);
 
+
+  const [ethPrice , setEthPrice] = useState()
+  
+  const generate_eth_price = async () => {
+    setEthPrice(await getEthPrice());
+  };
+
   const Search_familiy = async () => {
     try {
       SearchFriend(await search_all_user(user));
       //SearchFriend(await search_all_user(user));
     } catch (error) {
-      console.log('Friend Searching Failed !');
+      //console.log('Friend Searching Failed !');
     }
   };
   useEffect(() => {
+    generate_eth_price();
     Search_familiy();
   }, [user]);
-  console.log('SearchFa', my_friends);
+  //console.log('SearchFa', my_friends);
 
   useEffect(() => {
     const data = my_friends
@@ -31,9 +39,9 @@ const AdminCommunityTable = () => {
       .map((row) => {
         return {
           name: row.name,
-          receive: row.receivedamount,
-          sent: row.receivedamount * 1.04,
-          send: row.receivedamount * 1.04
+          receive: row.receivedamount * ethPrice,
+          sent: row.receivedamount * 1.04 * ethPrice,
+          send: row.receivedamount * 1.04 * ethPrice
         };
       });
     SearchFriend2(data);
@@ -69,7 +77,7 @@ const AdminCommunityTable = () => {
       label: 'Send',
       options: {
         customBodyRender: (value, dataIndex, rowIndex) => {
-          console.log('da', value, dataIndex, rowIndex);
+          //console.log('da', value, dataIndex, rowIndex);
           return (
             <>
               <Box textAlign="center" display="flex">

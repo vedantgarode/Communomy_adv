@@ -27,7 +27,7 @@ const ProfileSection = () => {
       setSelectedIndex(index)
       navigate("/login");
     } catch (error) {
-      console.log(error.message);
+      //console.log(error.message);
     }
   };
 

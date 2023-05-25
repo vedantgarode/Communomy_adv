@@ -22,7 +22,7 @@ import MonetizationOnTwoTone from '@mui/icons-material/MonetizationOnTwoTone';
 import ThumbUpAltTwoTone from '@mui/icons-material/ThumbUpAltTwoTone';
 import Diversity1TwoToneIcon from '@mui/icons-material/Diversity1TwoTone';
 //firebaseimport
-import { findUser } from '../../../src/firebase';
+import { findUser ,getEthPrice } from '../../../src/firebase';
 import { useUserAuth } from 'context/UserAuthContext';
 import { search_familiy, search_all_user } from '../../../src/firebase';
 // custom style
@@ -48,6 +48,12 @@ const Default = () => {
   const [my_friends, SearchFriend] = useState([]);
   const [all_friends, SearchFriends] = useState([]);
   
+  const [ethPrice , setEthPrice] = useState()
+  
+  const generate_eth_price = async () => {
+    setEthPrice(await getEthPrice());
+  };
+
   const bt1 = async () => {
     
     // const provider = new ethers.providers.Web3Provider(window.ethereum);
@@ -64,6 +70,7 @@ const Default = () => {
     }
   };
   useEffect(() => {
+    generate_eth_price();
     Search_familiy();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
@@ -111,8 +118,8 @@ const Default = () => {
             <ReportCard
               primary={
                 loggedUser.user_name === 'master'
-                  ? parseFloat(loggedUser?.total_money).toFixed(6) + '~'
-                  : parseFloat(loggedUser?.total_invested_amount).toFixed(6) + '~'
+                  ? parseFloat(loggedUser?.total_money * ethPrice).toFixed(2) + ' $'
+                  : parseFloat(loggedUser?.total_invested_amount * ethPrice).toFixed(2) + ' $'
               }
               secondary="Invested Amount"
               color={theme.palette.warning.main}
@@ -125,8 +132,8 @@ const Default = () => {
             <ReportCard
               primary={
                 loggedUser.user_name === 'master'
-                  ? (parseFloat(loggedUser?.total_money) * 1.04).toFixed(6) + '~'
-                  : +(parseFloat(loggedUser?.total_invested_amount) * 1.04).toFixed(6) + '~'
+                  ? (parseFloat(loggedUser?.total_money * ethPrice) * 1.04).toFixed(2) + ' $'
+                  : +(parseFloat(loggedUser?.total_invested_amount * ethPrice) * 1.04).toFixed(2) + ' $'
               }
               secondary="Expected Returns"
               color={theme.palette.success.main}
@@ -139,8 +146,8 @@ const Default = () => {
             <ReportCard
               primary={
                 loggedUser.user_name === 'master'
-                  ? parseFloat(loggedUser?.total_transaction)
-                  : parseFloat(loggedUser?.total_received_amount).toFixed(6) + '~'
+                  ? parseFloat(loggedUser?.total_transaction )
+                  : parseFloat(loggedUser?.total_received_amount * ethPrice).toFixed(2) + ' $'
               }
               // primary={loggedUser?.total_received_amount}
               secondary={loggedUser.user_name === 'master' ? 'Transcations' : 'Amount Recived'}
@@ -152,7 +159,7 @@ const Default = () => {
           </Grid>
           <Grid item lg={3} sm={6} xs={12}>
             <ReportCard
-              primary={loggedUser.user_name === 'master' ? all_friends?.length : my_friends?.length}
+              primary={loggedUser.user_name === 'master' ? all_friends?.length -1  : my_friends?.length}
               secondary="Members"
               color={theme.palette.error.main}
               footerData={loggedUser.user_name ? 'People in Communomy' : 'People in Your Community'}
@@ -176,11 +183,11 @@ const Default = () => {
                       icon={<TrendingDownIcon />}
                       footerData={[
                         {
-                          value: loggedUser?.total_received_amount,
-                          label: 'Total Asset'
+                          value: loggedUser?.total_received_amount * ethPrice + " $",
+                          label: 'Total Asset '
                         },
                         {
-                          value: (parseFloat(loggedUser?.total_received_amount) * 1.04).toFixed(6) + '~',
+                          value: (parseFloat(loggedUser?.total_received_amount *ethPrice) * 1.04).toFixed(2) + ' $',
                           label: 'Expected Return'
                         }
                       ]}
@@ -229,18 +236,18 @@ const Default = () => {
                   chartData={RevenuChartCardData}
                   totat_inv={
                     loggedUser.user_name === 'master'
-                      ? parseFloat(loggedUser?.total_money)
-                      : parseFloat(loggedUser?.total_invested_amount).toFixed(7)
+                      ? parseFloat(loggedUser?.total_money *ethPrice)
+                      : parseFloat(loggedUser?.total_invested_amount *ethPrice).toFixed(4)
                   }
                   totat_rcv={
                     loggedUser.user_name === 'master'
-                      ? parseFloat(loggedUser?.total_transaction)
-                      : parseFloat(loggedUser?.total_received_amount).toFixed(7)
+                      ? parseFloat(loggedUser?.total_transaction * ethPrice)
+                      : parseFloat(loggedUser?.total_received_amount *ethPrice ).toFixed(4)
                   }
                   totat_ecp={
                     loggedUser.user_name === 'master'
-                      ? (parseFloat(loggedUser?.total_money) * 1.04).toFixed(7)
-                      : (parseFloat(loggedUser?.total_invested_amount) * 1.04).toFixed(7)
+                      ? (parseFloat(loggedUser?.total_money * ethPrice) * 1.04).toFixed(4)
+                      : (parseFloat(loggedUser?.total_invested_amount * ethPrice) * 1.04).toFixed(4)
                   }
                 />
               </Grid>
@@ -270,7 +277,7 @@ const Default = () => {
                             <Grid item>
                               <Typography variant="body2" align="right">
                                 {parseFloat(
-                                  (parseFloat(row.receivedamount).toFixed(7) / parseFloat(loggedUser?.total_money).toFixed(7)) *
+                                  (parseFloat(row.receivedamount * ethPrice).toFixed(4) / parseFloat(loggedUser?.total_money *ethPrice).toFixed(4)) *
                                     100
                                 ).toFixed(2) + '%'}
                               </Typography>
@@ -279,7 +286,7 @@ const Default = () => {
                               <LinearProgress
                                 variant="determinate"
                                 aria-label="direct"
-                                value={(parseFloat(row.receivedamount) / parseFloat(loggedUser?.total_money)) * 100}
+                                value={(parseFloat(row.receivedamount * ethPrice) / parseFloat(loggedUser?.total_money *ethPrice)) * 100}
                                 color="primary"
                               />
                             </Grid>
@@ -298,7 +305,7 @@ const Default = () => {
                           <Grid item>
                             <Typography variant="body2" align="right">
                               {parseFloat(
-                                (parseFloat(row.receivedamount).toFixed(7) / parseFloat(loggedUser?.total_invested_amount).toFixed(7)) * 100
+                                (parseFloat(row.receivedamount * ethPrice).toFixed(4) / parseFloat(loggedUser?.total_invested_amount *ethPrice).toFixed(4)) * 100
                               ).toFixed(2) + '%'}
                             </Typography>
                           </Grid>
@@ -306,7 +313,7 @@ const Default = () => {
                             <LinearProgress
                               variant="determinate"
                               aria-label="direct"
-                              value={(parseFloat(row.receivedamount) / parseFloat(loggedUser?.total_invested_amount)) * 100}
+                              value={(parseFloat(row.receivedamount *ethPrice) / parseFloat(loggedUser?.total_invested_amount *ethPrice)) * 100}
                               color="primary"
                             />
                           </Grid>

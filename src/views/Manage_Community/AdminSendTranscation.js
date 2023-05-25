@@ -19,7 +19,7 @@ const AdminSendTranscation = (props) => {
   const handleClose = () => {
     setOpen(false);
   };
-  console.log('Riw', row);
+  //console.log('Riw', row);
   return (
     <>
       <Button variant="outlined" color="success" onClick={handleClickOpen('paper')}>

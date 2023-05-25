@@ -4,34 +4,46 @@ import { useState, useEffect } from 'react';
 import MUIDataTable from 'mui-datatables';
 import { Box } from '@mui/material';
 //firebase
-import { search_familiy} from '../../../src/firebase';
+import { search_familiy , getEthPrice} from '../../../src/firebase';
 import { useUserAuth } from 'context/UserAuthContext';
 import SendTranscation from './sendTranscation';
+
+
 
 const CommunityTable = () => {
   const { user } = useUserAuth();
   const [my_friends, SearchFriend] = useState([]);
   const [my_friends2, SearchFriend2] = useState([]);
 
+  const [ethPrice , setEthPrice] = useState()
+  
+  const eth_price = async () => {
+    setEthPrice(await getEthPrice());
+  };
+  console.log(ethPrice)
   const Search_familiy = async () => {
     try {
+      eth_price();
       SearchFriend(await search_familiy(user));
       //SearchFriend(await search_all_user(user));
     } catch (error) {
-      console.log('Friend Searching Failed !');
+      //console.log('Friend Searching Failed !');
     }
   };
   useEffect(() => {
+    
+    //console.log(ethPrice , "ethPrice")
+
     Search_familiy();
   }, [user]);
-  console.log('SearchFa', my_friends);
+  //console.log('SearchFa', my_friends);
 
   useEffect(() => {
     const data = my_friends?.map((row) => {
       return {
         name: row.name,
-        receive: row.receivedamount,
-        sent: row.sentamount,
+        receive: (row.receivedamount * ethPrice ).toFixed(2),
+        sent: (row.sentamount * ethPrice ).toFixed(2)  ,
         send: row.name
       };
     });
@@ -49,7 +61,7 @@ const CommunityTable = () => {
     },
     {
       name: 'receive',
-      label: 'Receive Amount',
+      label: 'Sent Amount ($)',
       options: {
         filter: true,
         sort: false
@@ -57,7 +69,7 @@ const CommunityTable = () => {
     },
     {
       name: 'sent',
-      label: 'Sent Amount',
+      label: 'Received Amount ($)',
       options: {
         filter: true,
         sort: false
@@ -67,8 +79,8 @@ const CommunityTable = () => {
       name: 'send',
       label: 'Send',
       options: {
-        customBodyRender: (value, dataIndex, rowIndex) => {
-          console.log('da', value, dataIndex, rowIndex);
+        customBodyRender: (value) => {
+          //console.log('da', value, dataIndex, rowIndex);
           return (
             <>
               <Box textAlign="center" display="flex">

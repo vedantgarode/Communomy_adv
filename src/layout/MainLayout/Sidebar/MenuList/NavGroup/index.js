@@ -14,7 +14,7 @@ import { useUserAuth } from 'context/UserAuthContext';
 
 const NavGroup = ({ item }) => {
   const {user}=useUserAuth();
-  console.log("user@dash",user)
+  //console.log("user@dash",user)
   const theme = useTheme();
    
   const items = item.children.map((menu) => {

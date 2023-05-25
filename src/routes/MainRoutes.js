@@ -18,7 +18,7 @@ const Rcvd_Transcations = Loadable(lazy(() => import('../views/RecivedTranscatio
 // ==============================|| MAIN ROUTES ||============================== //
 export default function MainRoutes() {
   const { user } = useUserAuth();
-  console.log('user', user === null);
+  //console.log('user', user === null);
   const [balebale, setbale] = useState();
   useEffect(() => {
     setbale(true);

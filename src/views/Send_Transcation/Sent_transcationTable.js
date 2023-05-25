@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import MUIDataTable from 'mui-datatables';
 import { useUserAuth } from 'context/UserAuthContext';
-import { findUser } from '../../firebase';
+import { findUser ,getEthPrice } from '../../firebase';
 import { search_senttransact } from '../../firebase';
 import moment from 'moment/moment';
 
@@ -9,20 +9,40 @@ const Sent_transcationTable = () => {
   const { user } = useUserAuth();
   const [Transactions, setTransactions] = useState();
   const [Transactions2, setTransactions2] = useState();
-
+  const [ethPrice , setEthPrice] = useState()
+  
+  const generate_eth_price = async () => {
+    setEthPrice(await getEthPrice());
+  };
   //   const columns = ['Recived By', 'Amount', 'Date and Time', 'Transcation ID'];
   const columns = [
     {
-      name: 'rcvd',
-      label: 'Recived Securely By',
+      name: 'sent',
+      label: 'From',
       options: {
         filter: true,
         sort: true
       }
     },
     {
+      name: 'rcvd',
+      label: 'To',
+      options: {
+        filter: true,
+        sort: true
+      }
+    },
+    {
+      name: 'eth',
+      label: 'Eth',
+      options: {
+        filter: true,
+        sort: false
+      }
+    },
+    {
       name: 'amt',
-      label: 'Amount',
+      label: 'Amount ($)',
       options: {
         filter: true,
         sort: false
@@ -60,30 +80,37 @@ const Sent_transcationTable = () => {
     filterType: 'dropdown'
   };
   const printMyTransactions = async () => {
+    console.log(ethPrice)
     try {
       const sender = await findUser(user.displayName.trim().toLowerCase());
-      console.log();
       setTransactions(await search_senttransact(sender));
     } catch (error) {
-      console.log('Transaction Searching Failed !', error);
+      //console.log('Transaction Searching Failed !', error);
     }
   };
   useEffect(() => {
+    generate_eth_price();
+  });
+  
+  useEffect(() => {
     printMyTransactions();
+    
   }, [user]);
 
   useEffect(() => {
     const data = Transactions?.map((row) => {
       return {
+        sent: row.sender,
         rcvd: row.receiver,
-        amt: row.amount,
+        eth: row.amount,
+        amt: row.amount * ethPrice,
         dt_Time: moment(row.time).format('MMMM Do YYYY, h:mm:ss a'),
         txid: row.transaction_id    
       };
     });
     setTransactions2(data);
   }, [Transactions]);
-  console.log('yx', Transactions);
+  //console.log('yx', Transactions);
 
   return <MUIDataTable data={Transactions2} columns={columns} options={options} />;
 };

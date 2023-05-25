@@ -31,8 +31,8 @@ const Member = () => {
       setUserSearchBID('No User Found !');
       setUserSearchMetamask('No User Found !');
       setbtn(true);
-      console.log('No user Found !');
-      console.log(error);
+      //console.log('No user Found !');
+      //console.log(error);
     }
   };
   const Add_familiy = async (e) => {
@@ -42,8 +42,8 @@ const Member = () => {
       setFriend(await add_familiy(user, user2.data(), userSearch.trim().toLowerCase()));
       toast.success(`${userSearchResult} Added to Your Community`)
     } catch (error) {
-      console.log('Friend addition Failed !');
-      console.log(error);
+      //console.log('Friend addition Failed !');
+      //console.log(error);
     }
   };
 
@@ -63,7 +63,7 @@ const Member = () => {
       </Grid>
       {flag_toview && (
         <>
-          {console.log(userSearchResult)}
+          
           <Grid item lg={12}>
             <TextField
               variant="outlined"
@@ -95,7 +95,7 @@ const Member = () => {
         </Button>
       </Grid>
       <Grid item lg={12} align="center">
-        {console.log('Button', btn)}
+        
         <Button variant="contained" disabled={btn} onClick={Add_familiy}>
           Add {userSearchResult} to Community
         </Button>

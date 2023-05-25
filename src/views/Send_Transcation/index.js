@@ -28,7 +28,7 @@ const Manage_Community = () => {
             <CardHeader
               title={
                 <Typography component="div" className="card-header">
-                  Send transcations
+                  Sent transcations
                 </Typography>
               }
             />
