@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import MUIDataTable from 'mui-datatables';
 import { useUserAuth } from 'context/UserAuthContext';
 import { findUser, getEthPrice } from '../../firebase';
-import { search_senttransact,search_transact } from '../../firebase';
+import { search_senttransact,search_admin_transact } from '../../firebase';
 import moment from 'moment/moment';
 import { CircularProgress } from '@mui/material';
 
@@ -24,7 +24,7 @@ const Sent_transcationTable = () => {
         setTransactions(await search_senttransact(sender));
       }
       else {
-        setTransactions(await search_transact("master"));
+        setTransactions(await search_admin_transact("master"));
       }
     } catch (error) {
       // Handle error

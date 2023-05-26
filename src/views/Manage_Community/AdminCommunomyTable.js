@@ -35,7 +35,7 @@ const AdminCommunityTable = () => {
   }, [user]);
 
   useEffect(() => {
-    if (my_friends.length === 0 || ethPrice === null) {
+    if (my_friends.length === 0 || ethPrice === undefined) {
       return; // Return if data is not ready yet
     }
 
@@ -102,7 +102,7 @@ const AdminCommunityTable = () => {
     filterType: 'dropdown',
   };
 
-  if (ethPrice === null) {
+  if (ethPrice === undefined) {
     // Show loading state while fetching Ethereum price
     return <CircularProgress />;
   }

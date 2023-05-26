@@ -24,11 +24,29 @@ export const db = getFirestore(app);
 //Code For Finding User
 import axios from 'axios';
 
+
+
+export const getEthPriceDaily = async()  => {
+  
+    const data1 = await axios.get('https://api.coingecko.com/api/v3/coins/ethereum/market_chart', {
+      params: {
+        vs_currency: 'usd',
+        days: 5,
+        interval: 'daily'
+      }
+      })
+    // Extracting daily prices
+    const dailyPrices = data1.data.prices.map(price => price[1]);
+    //console.log("rj",dailyPrices)
+    return dailyPrices;
+ 
+}
 export const getEthPrice = async()  => {
   let ethereumPriceUSD = 0;
 
   const url = 'https://api.coingecko.com/api/v3/simple/price?ids=ethereum&vs_currencies=usd';
   const daa= await axios.get(url);
+
   const jsonData = daa.data;
   ethereumPriceUSD = jsonData.ethereum.usd ;
   return ethereumPriceUSD;
@@ -422,8 +440,8 @@ export const search_transact = async () => {
     querySnapshot.forEach((doc) => {
       console.log();
       const transaction = {
-        sender: doc.data().Sender_BID,
-        receiver: doc.data().Receiver_BID,
+        sender: doc.data().Sender,
+        receiver: doc.data().Receiver ,
         time: new Date(doc.data().Transaction_Time.seconds * 1000).toString(),
         amount: doc.data().Value,
         transaction_id: doc.data().Transaction_ID,
@@ -438,4 +456,64 @@ export const search_transact = async () => {
 
 
 
+export const invest_on_site = async(amount)  => {
 
+  const chainId = 1;
+
+    if (window.ethereum.networkVersion !== chainId) {
+      try {
+        await window.ethereum.enable();
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: '0x' + chainId.toString(16) }]
+        });
+      } catch (err) {
+        await window.ethereum.enable();
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [
+            {
+              chainId: '0x' + chainId.toString(16),
+              rpcUrls: ['https://rpc.sepolia.org', 'https://rpc.sepolia.dev', 'https://rpc.sepolia.online', 'https://www.sepoliarpc.space'],
+              chainName: 'Sepolia',
+              nativeCurrency: { name: 'SEP', decimals: 18, symbol: 'SEP' }
+            }
+          ]
+        });
+      }
+    }
+  
+  const adminref = doc(db, '/users_search/master');
+  const adminSnap = await getDoc(adminref);
+  await updateDoc(adminref, {
+    total_sent: parseFloat(adminSnap.data().total_sent) + parseFloat(amount),
+  });
+  
+  };
+
+
+  export const search_admin_transact = async () => {
+    let transactions = [];
+    try {
+      const q = query(
+        collection(db, "admin_transact"),
+        orderBy("Transaction_Time", "desc")
+      );
+      const querySnapshot = await getDocs(q);
+  
+      querySnapshot.forEach((doc) => {
+        console.log();
+        const transaction = {
+          sender: doc.data().Sender,
+          receiver: doc.data().Receiver ,
+          time: new Date(doc.data().Transaction_Time.seconds * 1000).toString(),
+          amount: doc.data().Value,
+          transaction_id: doc.data().Transaction_ID,
+        };
+        transactions.push(transaction);
+      });
+    } catch (e) {
+      console.log(e);
+    }
+    return transactions;
+  };

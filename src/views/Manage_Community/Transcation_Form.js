@@ -41,7 +41,7 @@ const   Transcation_Form = (props) => {
         const user2 = await findUser(row);
         const sender = await findUser(user.displayName.trim().toLowerCase());
         setTError(await transact(sender.data(), user2.data(), amount / ethPrice, cointype));
-        toast.success('Please wait to Confirm Transaction');
+        toast.warning('Please wait to Confirm Transaction');
 
         //console.log(user2.data(), sender.data());
       } catch (error) {

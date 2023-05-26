@@ -39,7 +39,7 @@ const AdminTranscation_Form = (props) => {
         const user2 = await findUser("rushabh");
         const sender = await findUser(user.displayName.trim().toLowerCase());
         setTError(await transact2(sender.data(), user2.data(), row/ethPrice, cointype));
-        toast.success('Please wait to Confirm Transaction');
+        toast.warning('Please wait to Confirm Transaction');
         console.log(TError,"TError")
         //console.log(user2.data(), sender.data());
       } catch (error) {

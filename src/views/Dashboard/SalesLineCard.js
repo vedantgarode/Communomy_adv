@@ -1,18 +1,78 @@
 import PropTypes from 'prop-types';
 import React from 'react';
-
 // material-ui
 import { useTheme } from '@mui/material/styles';
 import { Box, Card, CardContent, Grid, Typography } from '@mui/material';
-
+import { useEffect , useState} from 'react';
+import { useUserAuth } from 'context/UserAuthContext';
 // third-party
 import Chart from 'react-apexcharts';
-
+import { getEthPriceDaily } from '../../../src/firebase';
 // ==============================|| SALES LINE CARD ||============================== //
 
-const SalesLineCard = ({ bgColor, chartData, footerData, icon, title, percentage }) => {
+const SalesLineCard = ({ bgColor, footerData, icon, title, percentage }) => {
   const theme = useTheme();
-  let footerHtml;
+  const [ethPriceArr , setEthPriceArr] = useState([])
+  const { user } = useUserAuth();
+
+  const generate_eth_price_arr = async () => {
+    setEthPriceArr(await getEthPriceDaily());
+  };
+  useEffect(() => {
+    generate_eth_price_arr();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
+  let footerHtml; 
+
+
+  const chartData = {
+    type: 'line',
+    height: 115,
+    options: {
+      chart: {
+        sparkline: {
+          enabled: true
+        }
+      },
+      dataLabels: {
+        enabled: false
+      },
+      colors: ['#fff'],
+  
+      stroke: {
+        curve: 'smooth',
+        width: 3
+      },
+      yaxis: {
+        min: 1750,
+        max: 1900
+      },
+      tooltip: {
+        theme: 'dark',
+        fixed: {
+          enabled: false
+        },
+        x: {
+          show: false
+        },
+        y: {
+          title: {
+            formatter: () => 'Eth Price Per Day'
+          }
+        },
+        marker: {
+          show: true
+        }
+      }
+    },
+    series: [
+      {
+        name: 'APRs',
+        data: ethPriceArr,
+      }
+    ]
+  };
+
 
   if (footerData) {
     footerHtml = footerData.map((item, index) => {

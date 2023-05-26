@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useState } from 'react';
 // material-ui
 import { useTheme, styled } from '@mui/material/styles';
-import { Grid, Card, CardHeader, CardContent, Typography, Divider, LinearProgress ,Button} from '@mui/material';
+import { Grid, Card, CardHeader, CardContent, Typography, Divider, LinearProgress ,CircularProgress} from '@mui/material';
 
 //project import
 import SalesLineCard from './SalesLineCard';
@@ -12,7 +12,7 @@ import SalesLineCardData from './chart/sale-chart-1';
 // import { ethers } from "ethers";
 
 import RevenuChartCard from './RevenuChartCard';
-import RevenuChartCardData from './chart/revenu-chart';
+//import RevenuChartCardData from './chart/revenu-chart';
 import ReportCard from './ReportCard';
 import { gridSpacing } from 'config.js';
 
@@ -22,7 +22,7 @@ import MonetizationOnTwoTone from '@mui/icons-material/MonetizationOnTwoTone';
 import ThumbUpAltTwoTone from '@mui/icons-material/ThumbUpAltTwoTone';
 import Diversity1TwoToneIcon from '@mui/icons-material/Diversity1TwoTone';
 //firebaseimport
-import { findUser ,getEthPrice } from '../../../src/firebase';
+import { findUser ,getEthPrice ,getEthPriceDaily } from '../../../src/firebase';
 import { useUserAuth } from 'context/UserAuthContext';
 import { search_familiy, search_all_user } from '../../../src/firebase';
 // custom style
@@ -47,20 +47,20 @@ const Default = () => {
   const [loggedUser, setloggedUser] = useState([])  ;
   const [my_friends, SearchFriend] = useState([]);
   const [all_friends, SearchFriends] = useState([]);
+  const [loading, setLoading] = useState(true); // Added loading state
+
   
   const [ethPrice , setEthPrice] = useState()
+  const [ethPriceArr , setEthPriceArr] = useState([])
+
+  const generate_eth_price_arr = async () => {
+    setEthPriceArr(await getEthPriceDaily());
+  };
   
   const generate_eth_price = async () => {
     setEthPrice(await getEthPrice());
   };
-
-  const bt1 = async () => {
-    
-    // const provider = new ethers.providers.Web3Provider(window.ethereum);
-    // const comet = new ethers.Contract(contractAddress, abiJson, provider);
-    // //const [ principal, baseTrackingIndex, baseTrackingAccrued, assetsIn ] = await comet.callStatic.userBasic('0xAccount');
-    console.log(ethers);
-  };
+ console.log("etherbhaarkaaarrya",ethPriceArr)
 
   const Search_familiy = async () => {
     try {
@@ -70,6 +70,8 @@ const Default = () => {
     }
   };
   useEffect(() => {
+    generate_eth_price_arr();
+    console.log(ethPriceArr,"yytt");
     generate_eth_price();
     Search_familiy();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -103,13 +105,26 @@ const Default = () => {
   };
 
   useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, []);
+
+  useEffect(() => {
     my_info();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
+
+  if (loading) {
+    return <CircularProgress />;
+  }
   console.log('loff', loggedUser, user.displayName);
   return (
     <Grid container spacing={gridSpacing}>
-          <Button onClick={bt1} >BUT1</Button>
+          
 
       <Grid item xs={12}>
         <Grid container spacing={gridSpacing}>
@@ -183,6 +198,7 @@ const Default = () => {
                   <Grid item xs={12}>
                     <SalesLineCard
                       chartData={SalesLineCardData}
+                      // arraydata={ethPriceArr}
                       title="Total Assets"
                       percentage="3% "
                       icon={<TrendingDownIcon />}
@@ -220,12 +236,12 @@ const Default = () => {
                             <Grid container alignItems="center" spacing={1}>
                               <Grid item>
                                 <Typography variant="subtitle2" align="left">
-                                  CR
+                                  24 Hr Change
                                 </Typography>
                               </Grid>
                               <Grid item sm zeroMinWidth>
-                                <Typography variant="h5" sx={{ color: theme.palette.success.main }} align="right">
-                                  -7.66 %
+                                <Typography variant="h5"  align="right">
+                                  {parseFloat(((ethPriceArr[5] - ethPriceArr[4])/ethPriceArr[5])*100).toFixed(2)+"%"}
                                 </Typography>
                               </Grid>
                             </Grid>
@@ -238,7 +254,7 @@ const Default = () => {
               </Grid>
               <Grid item xs={12} sm={6}>
                 <RevenuChartCard
-                  chartData={RevenuChartCardData}
+                  // chartData={RevenuChartCardData}
                   totat_inv={
                     loggedUser.user_name === 'master'
                       ? parseFloat(loggedUser?.total_money *ethPrice)
@@ -310,7 +326,7 @@ const Default = () => {
                           <Grid item>
                             <Typography variant="body2" align="right">
                               {parseFloat(
-                                (parseFloat(row.total_invested_amount * ethPrice).toFixed(4) / parseFloat(loggedUser?.total_received_amount *ethPrice).toFixed(4)) * 100
+                                (parseFloat(row.receivedamount * ethPrice).toFixed(4) / parseFloat(loggedUser?.total_invested_amount *ethPrice).toFixed(4)) * 100
                               ).toFixed(2) + '%'}
                             </Typography>
                           </Grid>
@@ -318,7 +334,7 @@ const Default = () => {
                             <LinearProgress
                               variant="determinate"
                               aria-label="direct"
-                              value={(parseFloat(row.total_invested_amount *ethPrice) / parseFloat(loggedUser?.total_received_amount *ethPrice)) * 100}
+                              value={(parseFloat(row.receivedamount *ethPrice) / parseFloat(loggedUser?.total_invested_amount *ethPrice)) * 100}
                               color="primary"
                             />
                           </Grid>

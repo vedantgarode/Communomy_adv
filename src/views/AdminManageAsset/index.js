@@ -2,7 +2,7 @@ import React, { useEffect } from 'react';
 import { useState } from 'react';
 // material-ui
 import { useTheme } from '@mui/material/styles';
-import { Grid, Card, CardHeader, CardContent, Typography, Divider, Button } from '@mui/material';
+import { Grid, Card, CardHeader, CardContent, Typography, Divider, Button,CircularProgress} from '@mui/material';
 import TextField from '@mui/material/TextField';
 
 //project import
@@ -25,7 +25,7 @@ import Diversity1TwoToneIcon from '@mui/icons-material/Diversity1TwoTone';
 //firebaseimport
 import { findUser, getEthPrice } from '../../../src/firebase';
 import { useUserAuth } from 'context/UserAuthContext';
-import { search_familiy, search_all_user } from '../../../src/firebase';
+import { search_familiy, search_all_user , invest_on_site } from '../../../src/firebase';
 // custom style
 
 // const FlatCardBlock = styled((props) => <Grid item sm={6} xs={12} {...props} />)(({ theme }) => ({
@@ -49,6 +49,8 @@ const Default = () => {
   const [loggedUser, setloggedUser] = useState([]);
   const [my_friends, SearchFriend] = useState([]);
   const [all_friends, SearchFriends] = useState([]);
+  const [loading, setLoading] = useState(true); // Added loading state
+
   const [amount, setamount] = useState();
 
   console.log(all_friends);
@@ -58,13 +60,7 @@ const Default = () => {
   const generate_eth_price = async () => {
     setEthPrice(await getEthPrice());
   };
-
-  const bt1 = async () => {
-    // const provider = new ethers.providers.Web3Provider(window.ethereum);
-    // const comet = new ethers.Contract(contractAddress, abiJson, provider);
-    // //const [ principal, baseTrackingIndex, baseTrackingAccrued, assetsIn ] = await comet.callStatic.userBasic('0xAccount');
-    console.log(ethers);
-  };
+ 
 
   const Search_familiy = async () => {
     try {
@@ -96,9 +92,10 @@ const Default = () => {
   // my_friends.forEach(element => {
   // });
   const handleSendCompundFin = ()=>{
-    console.log(amount,"hi")
+    console.log(amount , "Hi :")
+    invest_on_site(amount/ethPrice)
   }
-
+  console.log("idhar nan",loggedUser)
   const my_info = async () => {
     try {
       if (user && user.displayName) {
@@ -108,15 +105,27 @@ const Default = () => {
       console.log('No user Found !', error);
     }
   };
+  
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setLoading(false);
+    }, 1000);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, []);
 
   useEffect(() => {
     my_info();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user]);
+
+  if (loading) {
+    return <CircularProgress />;
+  }
   console.log('loff', loggedUser, user.displayName);
   return (
     <Grid container spacing={gridSpacing}>
-      <Button onClick={bt1}>BUT1</Button>
 
       <Grid item xs={12}>
         <Grid container spacing={gridSpacing}>
@@ -129,7 +138,7 @@ const Default = () => {
               }
               secondary="Invested Amount"
               color={theme.palette.warning.main}
-              footerData={loggedUser.user_name === 'master' ? 'Total Invested' : 'Invesments'}
+              footerData={loggedUser.user_name === 'master' ? 'Total Invested on Communomy' : 'Invesments'}
               iconPrimary={MonetizationOnTwoTone}
               // iconFooter={TrendingUpIcon}
             />
@@ -138,13 +147,14 @@ const Default = () => {
             <ReportCard
               primary={
                 loggedUser.user_name === 'master'
-                  ? parseFloat(loggedUser?.total_transaction)
+                  ? parseFloat((loggedUser?.total_sent)*ethPrice).toFixed(2) + " $"
                   : parseFloat(loggedUser?.total_received_amount * ethPrice).toFixed(2) + ' $'
               }
+              
               // primary={loggedUser?.total_received_amount}
-              secondary={loggedUser.user_name === 'master' ? 'Transcations' : 'Amount Recived'}
+              secondary={loggedUser.user_name === 'master' ? 'Money Sent' : 'Amount Recived'}
               color={theme.palette.primary.main}
-              footerData={loggedUser.user_name === 'master' ? 'Total Transcations' : 'Total Amount Recived'}
+              footerData={loggedUser.user_name === 'master' ? 'Total Money Sent To compund Finance' : 'Total Amount Recived'}
               iconPrimary={ThumbUpAltTwoTone}
               // iconFooter={TrendingUpIcon}
             />
@@ -153,12 +163,12 @@ const Default = () => {
             <ReportCard
               primary={
                 loggedUser.user_name === 'master'
-                  ? (parseFloat(loggedUser?.total_money * ethPrice) * 1.04).toFixed(2) + ' $'
+                  ? (parseFloat((loggedUser?.total_money - loggedUser?.total_sent)  * ethPrice)).toFixed(2) + ' $'
                   : +(parseFloat(loggedUser?.total_received_amount * ethPrice) * 1.04).toFixed(2) + ' $'
               }
-              secondary="Expected Returns"
+              secondary="Remaining"
               color={theme.palette.success.main}
-              footerData="Expected Returns YoY"
+              footerData="Money to be sent to Compund Finance"
               iconPrimary={MonetizationOnTwoTone}
               // iconFooter={TrendingDownIcon}
             />
@@ -168,17 +178,15 @@ const Default = () => {
               primary={
                 loggedUser.user_name === 'master'
                   ? (
-                      (parseFloat(loggedUser?.total_money * ethPrice) * 1.04).toFixed(2) -
-                      (parseFloat(loggedUser?.total_money * ethPrice) * 1).toFixed(2)
-                    ).toFixed(2) + ' $'
+                     ((parseFloat(loggedUser?.total_sent * ethPrice) * 1.04) - (parseFloat(loggedUser?.total_sent * ethPrice))).toFixed(4)+ " $"
+                    )
                   : (
-                      (parseFloat(loggedUser?.total_received_amount * ethPrice) * 1.04).toFixed(2) -
-                      parseFloat(loggedUser?.total_received_amount * ethPrice).toFixed(2) * 1
-                    ).toFixed(2) + ' $'
+                      (parseFloat(loggedUser?.total_received_amount * ethPrice) * 1.04).toFixed(2) 
+                    )
               }
-              secondary="Members"
+              secondary="Interest"
               color={theme.palette.error.main}
-              footerData={loggedUser.user_name ? 'People in Communomy' : 'People in Your Community'}
+              footerData={loggedUser.user_name ? 'Interest Earned on Compound Finance' : 'People in Your Community'}
               iconPrimary={Diversity1TwoToneIcon}
               // iconFooter={TrendingUpIcon}
             />
@@ -187,12 +195,17 @@ const Default = () => {
       </Grid>
       <Grid item xs={12}>
         <Grid container spacing={gridSpacing}>
+        <Grid item lg={4} xs={12}>
+
+        </Grid>
+
+        
           <Grid item lg={4} xs={12}>
             <Card>
               <CardHeader
                 title={
                   <Typography component="div" className="card-header">
-                    Add Member
+                    Invest on Compound Finanace 
                   </Typography>
                 }
               />
@@ -202,21 +215,24 @@ const Default = () => {
                   <TextField
                     variant="outlined"
                     value={amount}
-                    type="number"
                     fullWidth
                     margin="normal"
                     label="Amount to Invest on Compound Finance"
                     placeholder="Enter Amount"
                     onChange={(e) => setamount(e.target.value)}
                   />
-                  <Button variant="contained" size="small" onClick={handleSendCompundFin}>
+                  <Button variant="contained" size="small" onClick={handleSendCompundFin} disabled={amount<=0?true:false}>
                     Invest
                   </Button>
                 </Grid>
               </CardContent>
             </Card>
           </Grid>
-          <Grid item lg={8} xs={12}>
+          
+        </Grid>
+
+      </Grid>
+      <Grid item lg={12} xs={12}>
             <Card>
               <div style={{ overflow: 'hidden' }}>
                 <iframe
@@ -225,14 +241,12 @@ const Default = () => {
                   title="Embedded Website"
                   width="100%"
                   frameBorder="0"
-                  height="350px"
+                  height="1200px"
                   style={{ border: 'none', margin: '0', padding: '0', width: '100%' }}
                 />
               </div>
             </Card>
           </Grid>
-        </Grid>
-      </Grid>
 
       {/* <Grid item xs={12}>
         <Grid container spacing={gridSpacing}>

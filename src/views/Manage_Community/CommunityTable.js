@@ -2,7 +2,7 @@ import React from 'react';
 import { useState, useEffect } from 'react';
 //mui
 import MUIDataTable from 'mui-datatables';
-import { Box } from '@mui/material';
+import { Box ,CircularProgress} from '@mui/material';
 //firebase
 import { search_familiy , getEthPrice} from '../../../src/firebase';
 import { useUserAuth } from 'context/UserAuthContext';
@@ -18,7 +18,7 @@ const CommunityTable = () => {
   const [ethPrice , setEthPrice] = useState()
   
   const eth_price = async () => {
-    setEthPrice(await getEthPrice());
+    setEthPrice(await getEthPrice()); 
   };
   const Search_familiy = async () => {
     try {
@@ -97,6 +97,10 @@ const CommunityTable = () => {
     selectableRows: false,
     filterType: 'dropdown'
   };
+  if (ethPrice === undefined) {
+    // Show loading state while fetching Ethereum price
+    return <CircularProgress />;
+  }
   return (
     <div style={{ boxSizing: 'content-box' }}>
       <MUIDataTable title={"Member"} data={my_friends2} columns={columns} options={options} />
