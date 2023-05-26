@@ -14,6 +14,7 @@ const SamplePage = Loadable(lazy(() => import('../views/SamplePage')));
 const Manage_Community = Loadable(lazy(() => import('../views/Manage_Community')));
 const Send_Transcation = Loadable(lazy(() => import('../views/Send_Transcation')));
 const Rcvd_Transcations = Loadable(lazy(() => import('../views/RecivedTranscation')));
+const Admin_Manage_Asset = Loadable(lazy(()=>import('../views/AdminManageAsset')));
 
 // ==============================|| MAIN ROUTES ||============================== //
 export default function MainRoutes() {
@@ -31,6 +32,10 @@ export default function MainRoutes() {
         {
           path: 'dashboard',
           element: <DashboardDefault />
+        },
+        {
+          path: '/admin-assest',
+          element: <Admin_Manage_Asset />
         },
         {
           path: 'manage-community',

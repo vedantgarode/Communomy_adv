@@ -20,7 +20,6 @@ const CommunityTable = () => {
   const eth_price = async () => {
     setEthPrice(await getEthPrice());
   };
-  console.log(ethPrice)
   const Search_familiy = async () => {
     try {
       eth_price();
@@ -28,6 +27,7 @@ const CommunityTable = () => {
       //SearchFriend(await search_all_user(user));
     } catch (error) {
       //console.log('Friend Searching Failed !');
+      console.log(error)
     }
   };
   useEffect(() => {

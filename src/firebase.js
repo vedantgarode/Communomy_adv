@@ -62,7 +62,9 @@ export const search_all_user = async () => {
       const person = {
         name: doc.data().user_name,
         bid: doc.data().BID,
-        receivedamount: doc.data().total_received_amount
+        receivedamount: doc.data().total_received_amount,
+        userearning:doc.data().my_earnings,
+        usereturn:doc.data().my_return
       };
       family.push(person);
       //console.log("All USer :" ,family);
@@ -125,6 +127,105 @@ export const add_familiy = async (user1, user2, u2Name) => {
     return 'User Added !';
   }
 };
+//Admin T
+
+export const transact2 = async (user1, user2, amount, coin) => {
+  let acc = '';
+  try {
+    acc = await window.ethereum.enable();
+  } catch (err) {
+    return 'Metamask Not Installed';
+  }
+
+  try {
+    if (user1.BID === user2.BID) {
+      return 'You Cannot send money to Yourself';
+    }
+    const chainId = 11155111;
+
+    if (window.ethereum.networkVersion !== chainId) {
+      try {
+        await window.ethereum.enable();
+        await window.ethereum.request({
+          method: 'wallet_switchEthereumChain',
+          params: [{ chainId: '0x' + chainId.toString(16) }]
+        });
+      } catch (err) {
+        await window.ethereum.enable();
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [
+            {
+              chainId: '0x' + chainId.toString(16),
+              rpcUrls: ['https://rpc.sepolia.org', 'https://rpc.sepolia.dev', 'https://rpc.sepolia.online', 'https://www.sepoliarpc.space'],
+              chainName: 'Sepolia',
+              nativeCurrency: { name: 'SEP', decimals: 18, symbol: 'SEP' }
+            }
+          ]
+        });
+      }
+    }
+    let params = [
+      {
+        from: acc[0],
+        to: user2.metamask,
+        value: (Number(amount) * 1000000000000000000).toString(16),
+        gas: Number(2100000).toString(16),
+        gasPrice: Number(1000000).toString(16)
+      }
+    ];
+    let result = '';
+    try {
+      result = await window.ethereum.request({
+        method: 'eth_sendTransaction',
+        params
+      });
+    } catch (e) {
+    console.log('Failed');
+      return 'Error :' + e.code + '----' + e.message;
+    }
+
+    console.log('trasanctio hash :', result);
+    if (result == null) {
+      return 'Transaction Failed !';
+    } else {
+
+      const receiverRef = doc(db, '/users_search', user2.user_name);
+
+      await updateDoc(receiverRef, {
+        my_earnings: user2.my_earnings + (parseFloat(amount) - (user2.total_received_amount -( user2.my_return - user2.my_earnings) )),
+        my_return : user2.my_return + parseFloat(amount) 
+      });
+
+
+
+      const user2Ref = collection(db, '/admin_transact');
+      try{
+      await setDoc(doc(user2Ref), {
+        Transaction_ID: result,
+        Transaction_Time: new Date(),
+        Sender : user1.user_name,
+        Sender_BID: user1.BID,
+        Sender_metamask: user1.metamask,
+        Receiver : user2.user_name,
+        Receiver_BID: user2.BID,
+        Reciver_metamask: user2.metamask,
+        Coin_Type: "Ethereum",
+        Value: parseFloat(amount),
+        WeiAmount: amount * 1000000000000000
+      });
+    }catch(e){
+      console.log(coin)
+    }
+      return 'Transaction Added Successfully';
+    }
+  } catch (error) {
+    return 'Database Error !' + error;
+  }
+};
+
+
+
 
 //Make Transaction
 export const transact = async (user1, user2, amount, coin) => {
@@ -240,7 +341,7 @@ export const transact = async (user1, user2, amount, coin) => {
         Transaction_Time: new Date(),
         Sender : user1.user_name,
         Sender_BID: user1.BID,
-        Sender_metamask: user1.metamask,
+        Sender_metamask: acc[0],
         Receiver : user2.user_name,
         Receiver_BID: user2.BID,
         Reciver_metamask: user2.metamask,
@@ -308,8 +409,32 @@ export const search_receivedtransact = async (user) => {
   return transactions;
 };
 
+//Admin Transcation 
+export const search_transact = async () => {
+  let transactions = [];
+  try {
+    const q = query(
+      collection(db, "pending_transact"),
+      orderBy("Transaction_Time", "desc")
+    );
+    const querySnapshot = await getDocs(q);
 
-
+    querySnapshot.forEach((doc) => {
+      console.log();
+      const transaction = {
+        sender: doc.data().Sender_BID,
+        receiver: doc.data().Receiver_BID,
+        time: new Date(doc.data().Transaction_Time.seconds * 1000).toString(),
+        amount: doc.data().Value,
+        transaction_id: doc.data().Transaction_ID,
+      };
+      transactions.push(transaction);
+    });
+  } catch (e) {
+    console.log(e);
+  }
+  return transactions;
+};
 
 
 

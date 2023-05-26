@@ -59,6 +59,30 @@ export default {
         }
       ]
     },
+    {
+      id: 'master',
+      title: 'Admin Section',
+      type: 'master',
+      icon: icons['AccountTreeOutlinedIcon'],
+      children: [
+        // {
+        //   id: 'admin',
+        //   title: 'Admin Dashboard',
+        //   type: 'master',
+        //   url: '/admin-dashboard',
+        //   icon: icons['AppsOutlinedIcon']
+        // },
+        {
+          id: 'Manage',
+          title: 'Manage Assests',
+          type: 'master',
+          url: '/admin-assest',
+          icon: icons['FormatColorTextOutlinedIcon']
+        },
+        
+      ]
+    },
+
 
     {
       id: 'transactions',
@@ -79,28 +103,6 @@ export default {
           title: 'Received Transcations',
           type: 'item',
           url: '/recived-transcations',
-          icon: icons['FormatColorTextOutlinedIcon']
-        }
-      ]
-    },
-    {
-      id: 'master',
-      title: 'Admin Section',
-      type: 'master',
-      icon: icons['AccountTreeOutlinedIcon'],
-      children: [
-        {
-          id: 'admin',
-          title: 'Admin Dashboard',
-          type: 'master',
-          url: '/admin-dashboard',
-          icon: icons['AppsOutlinedIcon']
-        },
-        {
-          id: 'Manage',
-          title: 'Manage Assests',
-          type: 'master',
-          url: '/admin-assest',
           icon: icons['FormatColorTextOutlinedIcon']
         }
       ]

@@ -1,22 +1,63 @@
 import React, { useEffect, useState } from 'react';
 import MUIDataTable from 'mui-datatables';
 import { useUserAuth } from 'context/UserAuthContext';
-import { findUser ,getEthPrice} from '../../firebase';
-import { search_receivedtransact } from '../../firebase';
+import { findUser, getEthPrice } from '../../firebase';
+import { search_receivedtransact,search_transact } from '../../firebase';
 import moment from 'moment/moment';
+import { CircularProgress } from '@mui/material';
 
 const Rcvd_transcationTable = () => {
   const { user } = useUserAuth();
   const [Transactions, setTransactions] = useState();
   const [Transactions2, setTransactions2] = useState();
+  const [ethPrice, setEthPrice] = useState();
+  const [loading, setLoading] = useState(true); // Added loading state
 
-
-  const [ethPrice , setEthPrice] = useState()
-  
   const generate_eth_price = async () => {
     setEthPrice(await getEthPrice());
   };
-  //   const columns = ['Recived By', 'Amount', 'Date and Time', 'Transcation ID'];
+
+  const printReceivedTransactions = async () => {
+    try {
+      if(user.displayName!=="master"){
+        const sender = await findUser(user.displayName.trim().toLowerCase());
+        setTransactions(await search_receivedtransact(sender));
+      }
+      else {
+        setTransactions(await search_transact("master"));
+      }
+
+    } catch (error) {
+      // Handle error
+    }
+  };
+  console.log("transcations",Transactions)
+
+  useEffect(() => {
+    generate_eth_price();
+    printReceivedTransactions();
+  }, [user]);
+
+  useEffect(() => {
+    if (!Transactions || !ethPrice) {
+      return; // Return if data is not ready yet
+    }
+
+    const data = Transactions?.map((row) => {
+      return {
+        sent: row.sender,
+        rcvd: row.receiver + "(Me)",
+        eth: row.amount,
+        amt: row.amount * ethPrice,
+        dt_Time: moment(row.time).format('MMMM Do YYYY, h:mm:ss a'),
+        txid: row.transaction_id,
+      };
+    });
+
+    setTransactions2(data);
+    setLoading(false); // Set loading state to false
+  }, [Transactions, ethPrice]);
+
   const columns = [
     {
       name: 'sent',
@@ -70,47 +111,15 @@ const Rcvd_transcationTable = () => {
     }
   ];
 
-//   const data = [
-//     ['Joe James', 'Test Corp', 'Yonkers', 'NY'],
-//     ['John Walsh', 'Test Corp', 'Hartford', 'CT'],
-//     ['Bob Herm', 'Test Corp', 'Tampa', 'FL'],
-//     ['James Houston', 'Test Corp', 'Dallas', 'TX']
-//   ];
-
   const options = {
     selectableRows: false,
-    filterType: 'dropdown'
-  };
-  const printReceivedTransactions = async () => {
-    try {
-      const sender = await findUser(user.displayName.trim().toLowerCase());
-      //console.log(user.displayName.trim())
-      //console.log(sender.data())
-      setTransactions(await search_receivedtransact(sender));
-    } catch (error) {
-      //console.log("Transaction Searching Failed !" ,error);
-    }
+    filterType: 'dropdown',
   };
 
-  useEffect(() => {
-    generate_eth_price();
-    printReceivedTransactions();
-  }, [user]);
-
-  useEffect(() => {
-    const data = Transactions?.map((row) => {
-      return {
-        sent: row.sender,
-        rcvd: row.receiver + "(Me)",
-        eth: row.amount,
-        amt: row.amount * ethPrice,
-        dt_Time: moment(row.time).format('MMMM Do YYYY, h:mm:ss a'),
-        txid: row.transaction_id    
-      };
-    });
-    setTransactions2(data);
-  }, [Transactions]);
-  //console.log('yx', Transactions);
+  if (loading) {
+    // Show loading indicator while loading
+    return <CircularProgress />;
+  }
 
   return <MUIDataTable data={Transactions2} columns={columns} options={options} />;
 };

@@ -7,15 +7,15 @@ import Autocomplete from '@mui/material/Autocomplete';
 import { useUserAuth } from 'context/UserAuthContext';
 import { toast } from 'react-toastify';
 
-import { findUser ,getEthPrice } from '../../firebase';
-import { useNavigate } from 'react-router';
+import { findUser ,getEthPrice ,transact2} from '../../firebase';
+// import { useNavigate } from 'react-router';
 
 const AdminTranscation_Form = (props) => {
-  const { handleClickClose, row } = props;
+  const {row } = props;
 
   const [cointype, sentcointype] = useState();
   const [TError, setTError] = useState();
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   const [ethPrice , setEthPrice] = useState()
   
@@ -36,20 +36,20 @@ const AdminTranscation_Form = (props) => {
       //console.log('Transaction Failed !');
     } else {
       try {
-        const user2 = await findUser(row);
+        const user2 = await findUser("rushabh");
         const sender = await findUser(user.displayName.trim().toLowerCase());
-        setTError(await admin_transact(sender.data(), user2.data(), row, cointype));
+        setTError(await transact2(sender.data(), user2.data(), row/ethPrice, cointype));
         toast.success('Please wait to Confirm Transaction');
-
+        console.log(TError,"TError")
         //console.log(user2.data(), sender.data());
       } catch (error) {
         setTError('Select Valid User !');
-        //console.log('Transaction Failed !', error);
-        toast.error('error');
+        console.log('Transaction Failed !', error);
+        toast.error("errror"+error);
       }
     }
-    handleClickClose();
-    navigate('/send-transcations');
+    // handleClickClose();
+    // navigate('/send-transcations');
   };
 
   //   useEffect(() => {

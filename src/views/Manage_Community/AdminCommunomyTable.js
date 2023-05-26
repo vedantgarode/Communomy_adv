@@ -1,51 +1,58 @@
-import React from 'react';
-import { useState, useEffect } from 'react';
-//mui
+import React, { useState, useEffect } from 'react';
 import MUIDataTable from 'mui-datatables';
-import { Box } from '@mui/material';
-//firebase
-import { search_all_user , getEthPrice} from '../../../src/firebase';
+import { Box, CircularProgress } from '@mui/material';
+import { search_all_user, getEthPrice } from '../../../src/firebase';
 import { useUserAuth } from 'context/UserAuthContext';
 import AdminSendTranscation from './AdminSendTranscation';
+
 const AdminCommunityTable = () => {
   const { user } = useUserAuth();
-  const [my_friends, SearchFriend] = useState([]);
-  const [my_friends2, SearchFriend2] = useState([]);
+  const [my_friends, setMyFriends] = useState([]);
+  const [my_friends2, setMyFriends2] = useState([]);
+  const [ethPrice, setEthPrice] = useState(null); // Set initial value as null
 
-
-  const [ethPrice , setEthPrice] = useState()
-  
   const generate_eth_price = async () => {
-    setEthPrice(await getEthPrice());
+    try {
+      const price = await getEthPrice();
+      setEthPrice(price);
+    } catch (error) {
+      setEthPrice(1852);
+    }
   };
 
   const Search_familiy = async () => {
     try {
-      SearchFriend(await search_all_user(user));
-      //SearchFriend(await search_all_user(user));
+      const friends = await search_all_user(user);
+      setMyFriends(friends);
     } catch (error) {
-      //console.log('Friend Searching Failed !');
+      // Handle error
     }
   };
+
   useEffect(() => {
     generate_eth_price();
     Search_familiy();
   }, [user]);
-  //console.log('SearchFa', my_friends);
 
   useEffect(() => {
+    if (my_friends.length === 0 || ethPrice === null) {
+      return; // Return if data is not ready yet
+    }
+
     const data = my_friends
-      ?.filter((row) => row.name !== 'master')
+      .filter((row) => row.name !== 'master')
       .map((row) => {
         return {
           name: row.name,
-          receive: row.receivedamount * ethPrice,
-          sent: row.receivedamount * 1.04 * ethPrice,
-          send: row.receivedamount * 1.04 * ethPrice
+          receive: (row.receivedamount * ethPrice )-((row.usereturn-row.userearning)*ethPrice),
+          // receive: (row.receivedamount)-((row.usereturn-row.userearning)),
+          sent: ((row.receivedamount * ethPrice )-((row.usereturn-row.userearning)*ethPrice)) * 1.04 ,
+          send: ((row.receivedamount * ethPrice )-((row.usereturn-row.userearning)*ethPrice)) * 1.04 ,
         };
       });
-    SearchFriend2(data);
-  }, [my_friends]);
+
+    setMyFriends2(data);
+  }, [my_friends, ethPrice]);
 
   const columns = [
     {
@@ -76,7 +83,7 @@ const AdminCommunityTable = () => {
       name: 'send',
       label: 'Send',
       options: {
-        customBodyRender: (value, dataIndex, rowIndex) => {
+        customBodyRender: (value) => {
           //console.log('da', value, dataIndex, rowIndex);
           return (
             <>
@@ -92,11 +99,22 @@ const AdminCommunityTable = () => {
 
   const options = {
     selectableRows: false,
-    filterType: 'dropdown'
+    filterType: 'dropdown',
   };
+
+  if (ethPrice === null) {
+    // Show loading state while fetching Ethereum price
+    return <CircularProgress />;
+  }
+
   return (
     <div style={{ boxSizing: 'content-box' }}>
-      <MUIDataTable title={'Communomy Admin'} data={my_friends2} columns={columns} options={options} />
+      <MUIDataTable
+        title={'Communomy Admin'}
+        data={my_friends2}
+        columns={columns}
+        options={options}
+      />
     </div>
   );
 };

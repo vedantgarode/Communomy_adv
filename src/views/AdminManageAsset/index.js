@@ -1,61 +1,65 @@
 import React, { useEffect } from 'react';
 import { useState } from 'react';
 // material-ui
-import { useTheme, styled } from '@mui/material/styles';
-import { Grid, Card, CardHeader, CardContent, Typography, Divider, LinearProgress ,Button} from '@mui/material';
+import { useTheme } from '@mui/material/styles';
+import { Grid, Card, CardHeader, CardContent, Typography, Divider, Button } from '@mui/material';
+import TextField from '@mui/material/TextField';
 
 //project import
-import SalesLineCard from './SalesLineCard';
-import SalesLineCardData from './chart/sale-chart-1';
+// import SalesLineCard from './SalesLineCard';
+// import SalesLineCardData from './chart/sale-chart-1';
 
-//Ether 
+//Ether
 // import { ethers } from "ethers";
 
-import RevenuChartCard from './RevenuChartCard';
-import RevenuChartCardData from './chart/revenu-chart';
+// import RevenuChartCard from './RevenuChartCard';
+// import RevenuChartCardData from './chart/revenu-chart';
 import ReportCard from './ReportCard';
 import { gridSpacing } from 'config.js';
 
 // assets
-import TrendingDownIcon from '@mui/icons-material/TrendingDown';
+// import TrendingDownIcon from '@mui/icons-material/TrendingDown';
 import MonetizationOnTwoTone from '@mui/icons-material/MonetizationOnTwoTone';
 import ThumbUpAltTwoTone from '@mui/icons-material/ThumbUpAltTwoTone';
 import Diversity1TwoToneIcon from '@mui/icons-material/Diversity1TwoTone';
 //firebaseimport
-import { findUser ,getEthPrice } from '../../../src/firebase';
+import { findUser, getEthPrice } from '../../../src/firebase';
 import { useUserAuth } from 'context/UserAuthContext';
 import { search_familiy, search_all_user } from '../../../src/firebase';
 // custom style
 
-const FlatCardBlock = styled((props) => <Grid item sm={6} xs={12} {...props} />)(({ theme }) => ({
-  padding: '25px 25px',
-  borderLeft: '1px solid' + theme.palette.background.default,
-  [theme.breakpoints.down('sm')]: {
-    borderLeft: 'none',
-    borderBottom: '1px solid' + theme.palette.background.default
-  },
-  [theme.breakpoints.down('md')]: {
-    borderBottom: '1px solid' + theme.palette.background.default
-  }
-}));
+// const FlatCardBlock = styled((props) => <Grid item sm={6} xs={12} {...props} />)(({ theme }) => ({
+//   padding: '25px 25px',
+//   borderLeft: '1px solid' + theme.palette.background.default,
+//   [theme.breakpoints.down('sm')]: {
+//     borderLeft: 'none',
+//     borderBottom: '1px solid' + theme.palette.background.default
+//   },
+//   [theme.breakpoints.down('md')]: {
+//     borderBottom: '1px solid' + theme.palette.background.default
+//   }
+// }));
 
 // ==============================|| DASHBOARD DEFAULT ||============================== //
+
 
 const Default = () => {
   const theme = useTheme();
   const { user } = useUserAuth();
-  const [loggedUser, setloggedUser] = useState([])  ;
+  const [loggedUser, setloggedUser] = useState([]);
   const [my_friends, SearchFriend] = useState([]);
   const [all_friends, SearchFriends] = useState([]);
-  
-  const [ethPrice , setEthPrice] = useState()
-  
+  const [amount, setamount] = useState();
+
+  console.log(all_friends);
+
+  const [ethPrice, setEthPrice] = useState();
+
   const generate_eth_price = async () => {
     setEthPrice(await getEthPrice());
   };
 
   const bt1 = async () => {
-    
     // const provider = new ethers.providers.Web3Provider(window.ethereum);
     // const comet = new ethers.Contract(contractAddress, abiJson, provider);
     // //const [ principal, baseTrackingIndex, baseTrackingAccrued, assetsIn ] = await comet.callStatic.userBasic('0xAccount');
@@ -91,6 +95,9 @@ const Default = () => {
   // let Community_total =0
   // my_friends.forEach(element => {
   // });
+  const handleSendCompundFin = ()=>{
+    console.log(amount,"hi")
+  }
 
   const my_info = async () => {
     try {
@@ -109,12 +116,11 @@ const Default = () => {
   console.log('loff', loggedUser, user.displayName);
   return (
     <Grid container spacing={gridSpacing}>
-          <Button onClick={bt1} >BUT1</Button>
+      <Button onClick={bt1}>BUT1</Button>
 
       <Grid item xs={12}>
         <Grid container spacing={gridSpacing}>
           <Grid item lg={3} sm={6} xs={12}>
-
             <ReportCard
               primary={
                 loggedUser.user_name === 'master'
@@ -129,10 +135,10 @@ const Default = () => {
             />
           </Grid>
           <Grid item lg={3} sm={6} xs={12}>
-          <ReportCard
+            <ReportCard
               primary={
                 loggedUser.user_name === 'master'
-                  ? parseFloat(loggedUser?.total_transaction )
+                  ? parseFloat(loggedUser?.total_transaction)
                   : parseFloat(loggedUser?.total_received_amount * ethPrice).toFixed(2) + ' $'
               }
               // primary={loggedUser?.total_received_amount}
@@ -144,7 +150,7 @@ const Default = () => {
             />
           </Grid>
           <Grid item lg={3} sm={6} xs={12}>
-          <ReportCard
+            <ReportCard
               primary={
                 loggedUser.user_name === 'master'
                   ? (parseFloat(loggedUser?.total_money * ethPrice) * 1.04).toFixed(2) + ' $'
@@ -156,18 +162,23 @@ const Default = () => {
               iconPrimary={MonetizationOnTwoTone}
               // iconFooter={TrendingDownIcon}
             />
-
           </Grid>
           <Grid item lg={3} sm={6} xs={12}>
             <ReportCard
-              primary={loggedUser.user_name === 'master' ? 
-              ((parseFloat(loggedUser?.total_money * ethPrice) * 1.04).toFixed(2)-(parseFloat(loggedUser?.total_money * ethPrice) * 1).toFixed(2)).toFixed(2) + ' $'
-              :
-              ((parseFloat(loggedUser?.total_received_amount * ethPrice) * 1.04).toFixed(2) -(parseFloat(loggedUser?.total_received_amount * ethPrice)).toFixed(2) * 1).toFixed(2) + ' $'
-            }
-              secondary="Earnings"
+              primary={
+                loggedUser.user_name === 'master'
+                  ? (
+                      (parseFloat(loggedUser?.total_money * ethPrice) * 1.04).toFixed(2) -
+                      (parseFloat(loggedUser?.total_money * ethPrice) * 1).toFixed(2)
+                    ).toFixed(2) + ' $'
+                  : (
+                      (parseFloat(loggedUser?.total_received_amount * ethPrice) * 1.04).toFixed(2) -
+                      parseFloat(loggedUser?.total_received_amount * ethPrice).toFixed(2) * 1
+                    ).toFixed(2) + ' $'
+              }
+              secondary="Members"
               color={theme.palette.error.main}
-              footerData={loggedUser.user_name==="master" ? 'Earned by Communomy' : 'My Earnings'}
+              footerData={loggedUser.user_name ? 'People in Communomy' : 'People in Your Community'}
               iconPrimary={Diversity1TwoToneIcon}
               // iconFooter={TrendingUpIcon}
             />
@@ -176,27 +187,86 @@ const Default = () => {
       </Grid>
       <Grid item xs={12}>
         <Grid container spacing={gridSpacing}>
+          <Grid item lg={4} xs={12}>
+            <Card>
+              <CardHeader
+                title={
+                  <Typography component="div" className="card-header">
+                    Add Member
+                  </Typography>
+                }
+              />
+              <Divider />
+              <CardContent>
+                <Grid item lg={12} align="center">
+                  <TextField
+                    variant="outlined"
+                    value={amount}
+                    type="number"
+                    fullWidth
+                    margin="normal"
+                    label="Amount to Invest on Compound Finance"
+                    placeholder="Enter Amount"
+                    onChange={(e) => setamount(e.target.value)}
+                  />
+                  <Button variant="contained" size="small" onClick={handleSendCompundFin}>
+                    Invest
+                  </Button>
+                </Grid>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item lg={8} xs={12}>
+            <Card>
+              <div style={{ overflow: 'hidden' }}>
+                <iframe
+                  id="embedded-website"
+                  src="https://app.compound.finance/?market=usdc-mainnet" // Replace with the URL of the website you want to embed
+                  title="Embedded Website"
+                  width="100%"
+                  frameBorder="0"
+                  height="350px"
+                  style={{ border: 'none', margin: '0', padding: '0', width: '100%' }}
+                />
+              </div>
+            </Card>
+          </Grid>
+        </Grid>
+      </Grid>
+
+      {/* <Grid item xs={12}>
+        <Grid container spacing={gridSpacing}>
           <Grid item lg={8} xs={12}>
             <Grid container spacing={gridSpacing}>
               <Grid item xs={12} sm={6}>
                 <Grid container spacing={gridSpacing}>
                   <Grid item xs={12}>
-                    <SalesLineCard
-                      chartData={SalesLineCardData}
-                      title="Total Assets"
-                      percentage="3% "
-                      icon={<TrendingDownIcon />}
-                      footerData={[
-                        {
-                          value: loggedUser?.total_received_amount * ethPrice + " $",
-                          label: 'Total Asset '
-                        },
-                        {
-                          value: (parseFloat(loggedUser?.total_received_amount *ethPrice) * 1.04).toFixed(2) + ' $',
-                          label: 'Expected Return'
+                    <Card>
+                      <CardHeader
+                        title={
+                          <Typography component="div" className="card-header">
+                            Add Member
+                          </Typography>
                         }
-                      ]}
-                    />
+                      />
+                      <Divider />
+                      <CardContent>
+                        <Grid item lg={12} align="center">
+                          <TextField
+                            variant="outlined"
+                            // value={}
+                            fullWidth
+                            margin="normal"
+                            label="Amount to Invest on Compound Finance"
+                            placeholder="Enter Amount"
+                            // onChange={(e) => setUserSearch(e.target.value)}
+                          />
+                          <Button variant="contained" size="small">
+                            Invest
+                          </Button>
+                        </Grid>
+                      </CardContent>
+                    </Card>
                   </Grid>
                   <Grid item xs={12} sx={{ display: { md: 'block', sm: 'none' } }}>
                     <Card>
@@ -206,12 +276,12 @@ const Default = () => {
                             <Grid container alignItems="center" spacing={1}>
                               <Grid item>
                                 <Typography variant="subtitle2" align="left">
-                                  ETH :
+                                  REALTY
                                 </Typography>
                               </Grid>
                               <Grid item sm zeroMinWidth>
                                 <Typography variant="h5" sx={{ color: theme.palette.error.main }} align="right">
-                                  {ethPrice}
+                                  -0.99
                                 </Typography>
                               </Grid>
                             </Grid>
@@ -220,12 +290,12 @@ const Default = () => {
                             <Grid container alignItems="center" spacing={1}>
                               <Grid item>
                                 <Typography variant="subtitle2" align="left">
-                                  CR
+                                  INFRA
                                 </Typography>
                               </Grid>
                               <Grid item sm zeroMinWidth>
                                 <Typography variant="h5" sx={{ color: theme.palette.success.main }} align="right">
-                                  -7.66 %
+                                  -7.66
                                 </Typography>
                               </Grid>
                             </Grid>
@@ -236,18 +306,18 @@ const Default = () => {
                   </Grid>
                 </Grid>
               </Grid>
-              <Grid item xs={12} sm={6}>
+              {/* <Grid item xs={12} sm={6}>
                 <RevenuChartCard
                   chartData={RevenuChartCardData}
                   totat_inv={
                     loggedUser.user_name === 'master'
-                      ? parseFloat(loggedUser?.total_money *ethPrice)
-                      : parseFloat(loggedUser?.total_invested_amount *ethPrice).toFixed(4)
+                      ? parseFloat(loggedUser?.total_money * ethPrice)
+                      : parseFloat(loggedUser?.total_invested_amount * ethPrice).toFixed(4)
                   }
                   totat_rcv={
                     loggedUser.user_name === 'master'
                       ? parseFloat(loggedUser?.total_transaction * ethPrice)
-                      : parseFloat(loggedUser?.total_received_amount *ethPrice ).toFixed(4)
+                      : parseFloat(loggedUser?.total_received_amount * ethPrice).toFixed(4)
                   }
                   totat_ecp={
                     loggedUser.user_name === 'master'
@@ -255,8 +325,8 @@ const Default = () => {
                       : (parseFloat(loggedUser?.total_received_amount * ethPrice) * 1.04).toFixed(4)
                   }
                 />
-              </Grid>
-            </Grid>
+              </Grid> */}
+      {/* </Grid>
           </Grid>
           <Grid item lg={4} xs={12}>
             <Card>
@@ -270,7 +340,7 @@ const Default = () => {
               <Divider />
               <CardContent>
                 <Grid container spacing={gridSpacing}>
-                  {console.log("alldosy",all_friends)}
+                  {console.log('alldosy', all_friends)}
                   {all_friends?.map((row) => {
                     if (row.name !== 'master') {
                       return (
@@ -282,7 +352,8 @@ const Default = () => {
                             <Grid item>
                               <Typography variant="body2" align="right">
                                 {parseFloat(
-                                  (parseFloat(row.receivedamount * ethPrice).toFixed(4) / parseFloat(loggedUser?.total_money *ethPrice).toFixed(4)) *
+                                  (parseFloat(row.receivedamount * ethPrice).toFixed(4) /
+                                    parseFloat(loggedUser?.total_money * ethPrice).toFixed(4)) *
                                     100
                                 ).toFixed(2) + '%'}
                               </Typography>
@@ -291,7 +362,7 @@ const Default = () => {
                               <LinearProgress
                                 variant="determinate"
                                 aria-label="direct"
-                                value={(parseFloat(row.receivedamount * ethPrice) / parseFloat(loggedUser?.total_money *ethPrice)) * 100}
+                                value={(parseFloat(row.receivedamount * ethPrice) / parseFloat(loggedUser?.total_money * ethPrice)) * 100}
                                 color="primary"
                               />
                             </Grid>
@@ -310,7 +381,9 @@ const Default = () => {
                           <Grid item>
                             <Typography variant="body2" align="right">
                               {parseFloat(
-                                (parseFloat(row.total_invested_amount * ethPrice).toFixed(4) / parseFloat(loggedUser?.total_received_amount *ethPrice).toFixed(4)) * 100
+                                (parseFloat(row.receivedamount * ethPrice).toFixed(4) /
+                                  parseFloat(loggedUser?.total_invested_amount * ethPrice).toFixed(4)) *
+                                  100
                               ).toFixed(2) + '%'}
                             </Typography>
                           </Grid>
@@ -318,7 +391,9 @@ const Default = () => {
                             <LinearProgress
                               variant="determinate"
                               aria-label="direct"
-                              value={(parseFloat(row.total_invested_amount *ethPrice) / parseFloat(loggedUser?.total_received_amount *ethPrice)) * 100}
+                              value={
+                                (parseFloat(row.receivedamount * ethPrice) / parseFloat(loggedUser?.total_invested_amount * ethPrice)) * 100
+                              }
                               color="primary"
                             />
                           </Grid>
@@ -331,7 +406,7 @@ const Default = () => {
             </Card>
           </Grid>
         </Grid>
-      </Grid>
+      </Grid> */}
     </Grid>
   );
 };
