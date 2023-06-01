@@ -1,11 +1,7 @@
-import { createContext, useContext, useEffect, useState } from "react";
-import {
-  createUserWithEmailAndPassword,
-  signInWithEmailAndPassword,
-  onAuthStateChanged,
-  signOut,  
-} from "firebase/auth";
-import { auth } from "../firebase";
+import { createContext, useContext, useEffect, useState } from 'react';
+import { createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from 'firebase/auth';
+import { auth } from '../firebase';
+import PropTypes from 'prop-types';
 
 const userAuthContext = createContext();
 
@@ -21,11 +17,10 @@ export function UserAuthContextProvider({ children }) {
   function logOut() {
     return signOut(auth);
   }
-  
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentuser) => {
-      console.log("Auth", currentuser);
+      //console.log('Auth', currentuser);
       setUser(currentuser);
     });
 
@@ -34,15 +29,12 @@ export function UserAuthContextProvider({ children }) {
     };
   }, []);
 
-  return (
-    <userAuthContext.Provider
-      value={{ user, logIn, signUp, logOut }}
-    >
-      {children}
-    </userAuthContext.Provider>
-  );
+  return <userAuthContext.Provider value={{ user, logIn, signUp, logOut }}>{children}</userAuthContext.Provider>;
 }
 
 export function useUserAuth() {
   return useContext(userAuthContext);
 }
+UserAuthContextProvider.propTypes = {
+  children: PropTypes.node.isRequired
+};
